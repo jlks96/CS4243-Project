@@ -17,6 +17,8 @@ python detector.py <classifier> <image>
 
 ### Training
 
+Download the executables from [here](https://s3.ap-south-1.amazonaws.com/mediumarticlebucketclassifer/OpenCV_Dependencies.rar) and extract it into `cascadeclassifier\` 
+
 1) Create bg.txt (negative examples)
 ```
 python generate_bg.py <folder_with_neg_egs>
