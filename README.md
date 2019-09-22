@@ -28,7 +28,9 @@ python generate_bg.py <folder_with_neg_egs>
 
 2) Create waldo.vec (positive examples)
 ```
-python generate_info.py <folder_with_pos_egs> <size_of_image>
+python generate_info.py <folder_with_pos_egs> <size_of_image>  // for additional training images
+
+python generate_info_xml.py  // for xml annonations provided by course
 
 opencv_createsamples -info info.dat -num <#_pos_egs> -w 50 -h 50 -vec waldo.vec
 ```
