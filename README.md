@@ -39,9 +39,11 @@ opencv_createsamples -info info.dat -num <#_pos_egs> -w 50 -h 50 -vec waldo.vec
 ```
 opencv_traincascade -data classifier -vec waldo.vec -bg bg.txt -numPos <#_pos_egs> -numNeg <#_neg_egs> -numStages 50 -w 50 -h 50
 ```
-*Reference: [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)*
 
-Adapted from (https://raw.githubusercontent.com/CrzyDataScience/WhereIsWally)
+### References
+- Code adapted from (https://raw.githubusercontent.com/CrzyDataScience/WhereIsWally)
+- Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
+- [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)*
 
 
 
