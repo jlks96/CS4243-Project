@@ -42,10 +42,41 @@ opencv_createsamples -info info.dat -num <#_pos_egs> -w 50 -h 50 -vec waldo.vec
 opencv_traincascade -data classifier -vec waldo.vec -bg bg.txt -numPos <#_pos_egs> -numNeg <#_neg_egs> -numStages 50 -w 50 -h 50
 ```
 
+*Code adapted from (https://github.com/CrzyDataScience/WhereIsWally)*
+
+## HOG SVM Detector
+
+Content under folder `hog_svm`
+
+### Detection
+
+For sklearn version, execute the command 
+```
+python test_HOG_SVM.py
+```
+
+For OpenCV version, execute the command
+```
+python OpenCV_test_HOG_SVM.py
+```
+
+### Training
+
+For sklearn version, execute the command 
+```
+python train_HOG_SVM.py
+```
+
+For OpenCV version, execute the command
+```
+python OpenCV_train_HOG_SVM.py
+```
+
+*Code adapted from (https://github.com/SamPlvs/Object-detection-via-HOG-SVM)*
+
 ### References
-- Code adapted from (https://raw.githubusercontent.com/CrzyDataScience/WhereIsWally)
 - Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
-- [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)*
+- [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)
 
 
 
