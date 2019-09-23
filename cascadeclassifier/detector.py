@@ -9,7 +9,7 @@ img = cv2.imread(image_path)
 
 cascade = cv2.CascadeClassifier(classifier)
 
-waldos = cascade.detectMultiScale(img, minNeighbors=18)
+waldos = cascade.detectMultiScale(img, scaleFactor=1.01)
 
 for (i, (x, y, w, h)) in enumerate(waldos):
     cv2.rectangle(img, (x, y), (x + w, y + h), (255,0,0), 2)
