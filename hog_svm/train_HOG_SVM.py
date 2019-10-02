@@ -8,6 +8,8 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import LinearSVC
 from sklearn.kernel_approximation import Nystroem
 from PIL import Image
+from platform import system
+sp = '/' if str(system()) == 'Windows' else '\\'
 
 # Define parameters of HOG feature extraction
 orientations = 9
@@ -31,7 +33,7 @@ labels = []
 
 # Compute HOG features and label them:
 for file in pos_im_listing:
-    img = Image.open(pos_im_path + '\\' + file)
+    img = Image.open(pos_im_path + sp + file)
     img = img.resize((25, 50))
     gray = img.convert('L') # convert the image to grayscale
     # Calculate HOG for positive features
@@ -41,7 +43,7 @@ for file in pos_im_listing:
     
 # Same for the negative images
 for file in neg_im_listing:
-    img= Image.open(neg_im_path + '\\' + file)
+    img= Image.open(neg_im_path + sp + file)
     img = img.resize((25, 50))
     gray= img.convert('L')
     # Calculate the HOG for negative features

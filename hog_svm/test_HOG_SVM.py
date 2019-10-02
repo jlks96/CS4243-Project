@@ -8,6 +8,8 @@ from skimage.transform import pyramid_gaussian
 from sklearn.externals import joblib
 from skimage import color
 from imutils.object_detection import non_max_suppression
+from platform import system
+sp = '/' if str(system()) == 'Windows' else '\\'
 
 # Define HOG Parameters
 # For weaker HOG, orientations = 8, pixels per cell = (16,16), cells per block = (1,1)
@@ -32,7 +34,7 @@ scale_power = 0
 detections = []
 
 # Read the image you want to detect the object in:
-img = cv2.imread("original_images\\8.jpg")
+img = cv2.imread("original_images" + sp + "8.jpg")
 
 # Try it with image resized if the image is too big
 img = cv2.resize(img, (900, 400)) # commenting this line out for default size

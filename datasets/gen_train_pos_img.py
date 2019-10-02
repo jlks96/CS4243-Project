@@ -2,16 +2,13 @@ from PIL import Image
 import xml.etree.ElementTree as ET
 import os
 from platform import system
+sp = '/' if str(system()) == 'Windows' else '\\'
+# separator
 
-f_divider = '/'
-
-if str(system()) == 'Windows':
-    f_divider = '\\'
-
-training_set = open('ImageSets'+f_divider+'train.txt')
+training_set = open('ImageSets'+sp+'train.txt')
 
 for idx in training_set:
-    tree = ET.parse('Annotations'+f_divider+'{}.xml'.format(idx[:3]))
+    tree = ET.parse('Annotations'+sp+'{}.xml'.format(idx[:3]))
     root = tree.getroot()
 
     matches = []
@@ -24,6 +21,6 @@ for idx in training_set:
                             int(bndbox.find('ymax').text)))
     if len(matches) > 0:
         for i, match in enumerate(matches):
-            im = Image.open('JPEGImages'+f_divider+'{}.jpg'.format(idx[:3]))
+            im = Image.open('JPEGImages'+sp+'{}.jpg'.format(idx[:3]))
             cropped = im.crop((match[0], match[1], match[2], match[3]))
-            cropped.save('PositiveImages'+f_divider+'{}-{}.jpg'.format(idx[:3], i), "JPEG")
+            cropped.save('PositiveImages'+sp+'{}-{}.jpg'.format(idx[:3], i), "JPEG")

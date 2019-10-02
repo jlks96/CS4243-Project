@@ -4,6 +4,8 @@ import sys
 import os
 import pickle
 import glob
+from platform import system
+sp = '/' if str(system()) == 'Windows' else '\\'
 
 def inside(r, q):
     rx, ry, rw, rh = r
@@ -19,7 +21,7 @@ svm = pickle.load(open("svm.pickle", "rb"))
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(np.array(svm))
 
-img = cv2.imread("original_images\\8.jpg")
+img = cv2.imread("original_images" + sp + "8.jpg")
 
 print("Starting detection...")
 found, w = hog.detectMultiScale(img, winStride=(8,8), padding=(32,32), scale=1.1)

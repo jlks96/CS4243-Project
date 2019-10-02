@@ -7,6 +7,8 @@ import re
 from skimage.feature import hog
 from PIL import Image
 from cv2 import ml
+from platform import system
+sp = '/' if str(system()) == 'Windows' else '\\'
 
 # Parameters of HOG feature extraction
 orientations = 9
@@ -23,7 +25,7 @@ data= []
 labels = []
 
 for file in pos_im_listing:
-    img = Image.open(pos_im_path + '\\' + file)
+    img = Image.open(pos_im_path + sp + file)
     img = img.resize((64, 128))
     gray = img.convert('L')
     fd = hog(gray, orientations, pixels_per_cell, cells_per_block, block_norm='L2', feature_vector=True)
@@ -31,7 +33,7 @@ for file in pos_im_listing:
     labels.append(1)
 
 for file in neg_im_listing:
-    img= Image.open(neg_im_path + '\\' + file)
+    img= Image.open(neg_im_path + sp + file)
     img = img.resize((64, 128))
     gray= img.convert('L')
     fd = hog(gray, orientations, pixels_per_cell, cells_per_block, block_norm='L2', feature_vector=True) 
