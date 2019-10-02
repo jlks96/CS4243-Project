@@ -2,12 +2,13 @@ from PIL import Image
 import xml.etree.ElementTree as ET
 import os
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+from tqdm import tqdm
+sp = '\\' if str(system()) == 'Windows' else '/'
 # separator
 
 training_set = open('ImageSets'+sp+'train.txt')
 
-for idx in training_set:
+for idx in tqdm(training_set):
     tree = ET.parse('Annotations'+sp+'{}.xml'.format(idx[:3]))
     root = tree.getroot()
 

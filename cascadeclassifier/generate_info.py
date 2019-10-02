@@ -1,7 +1,7 @@
 import os
 import sys
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 
 folder = sys.argv[1]
 size = sys.argv[2]

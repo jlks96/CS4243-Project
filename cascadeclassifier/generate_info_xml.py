@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import os
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 # separator
 
 info = open('info.dat', 'a')

@@ -9,7 +9,7 @@ from sklearn.externals import joblib
 from skimage import color
 from imutils.object_detection import non_max_suppression
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 
 # Define HOG Parameters
 # For weaker HOG, orientations = 8, pixels per cell = (16,16), cells per block = (1,1)

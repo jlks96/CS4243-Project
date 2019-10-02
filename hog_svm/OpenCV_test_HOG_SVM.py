@@ -5,7 +5,7 @@ import os
 import pickle
 import glob
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 
 def inside(r, q):
     rx, ry, rw, rh = r

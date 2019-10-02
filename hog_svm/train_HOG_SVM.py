@@ -9,7 +9,7 @@ from sklearn.svm import LinearSVC
 from sklearn.kernel_approximation import Nystroem
 from PIL import Image
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 
 # Define parameters of HOG feature extraction
 orientations = 9

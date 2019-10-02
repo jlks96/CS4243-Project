@@ -8,7 +8,7 @@ from skimage.feature import hog
 from PIL import Image
 from cv2 import ml
 from platform import system
-sp = '/' if str(system()) == 'Windows' else '\\'
+sp = '\\' if str(system()) == 'Windows' else '/'
 
 # Parameters of HOG feature extraction
 orientations = 9
