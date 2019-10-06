@@ -1,5 +1,5 @@
 datasets/PositiveImages/*.jpg
-CS4243-Project/template_matching/results
+template_matching/results/*.jpg
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
