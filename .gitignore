@@ -2,9 +2,6 @@ datasets/PositiveImages/*.jpg
 template_matching/results/*.jpg
 *.DS_Store
 
-# ignore .icloud file for mac
-*.cloud
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
