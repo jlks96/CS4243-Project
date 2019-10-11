@@ -1,5 +1,6 @@
 datasets/PositiveImages/*.jpg
 template_matching/results/*.jpg
+template_matching/templates/
 *.DS_Store
 
 # Byte-compiled / optimized / DLL files
