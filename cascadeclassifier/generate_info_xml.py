@@ -1,14 +1,12 @@
 import xml.etree.ElementTree as ET
 import os
 from platform import system
-sp = '\\' if str(system()) == 'Windows' else '/'
-# separator
 
-info = open('info.dat', 'a')
-training_set = open('..'+ sp +'datasets'+ sp +'ImageSets'+ sp +'train.txt')
+info = open('info2.dat', 'a')
+training_set = open(os.path.join('..', 'datasets', 'ImageSets', 'train.txt'))
 
 for idx in training_set:
-    tree = ET.parse('..'+ sp +'datasets'+ sp +'Annotations'+ sp +'{}.xml'.format(idx[:3]))
+    tree = ET.parse(os.path.join('..', 'datasets', 'Annotations', '{}.xml'.format(idx[:3])))
     root = tree.getroot()
 
     matches = []
@@ -19,10 +17,10 @@ for idx in training_set:
                             int(bndbox.find('xmax').text) - int(bndbox.find('xmin').text),
                             int(bndbox.find('ymax').text) - int(bndbox.find('ymin').text)))
     if len(matches) > 0:
-        info.write('..' + sp + 'datasets' + sp + 'JPEGImages' + sp + '{}.jpg {} '.format(idx[:3], len(matches)))
+        info.write(" ".join(map(str, [os.path.join('..', 'datasets', 'JPEGImages', '{}.jpg'.format(idx[:3])), len(matches)])))
 
         for match in matches:
-            info.write('{} {} {} {} '.format(match[0], match[1], match[2], match[3]))
+            info.write(" " + " ".join(map(str, [match[0], match[1], match[2], match[3]])))
 
         info.write('\n')
 

@@ -132,3 +132,8 @@ dmypy.json
 # Others
 .vscode/
 *.code-workspace
+datasets/PositiveImages/*.jpg
+template_matching/results/*.jpg
+cascadeclassifier/training_dataset/
+hog_svm/data/
+*.DS_Store
