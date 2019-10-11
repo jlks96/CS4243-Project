@@ -5,9 +5,9 @@ import sys
 classifier = sys.argv[1]
 image_path = sys.argv[2]
 image_idx = sys.argv[3]
-baseline_path = sys.argv[4]
+output_path = sys.argv[4]
 
-bl = open(os.path.join(baseline_path, "baseline.txt"), "a")
+bl = open(os.path.join(output_path, "baseline.txt"), "a")
 
 img = cv2.imread(image_path)
 cascade = cv2.CascadeClassifier(classifier)
