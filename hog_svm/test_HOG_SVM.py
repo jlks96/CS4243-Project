@@ -8,8 +8,6 @@ from skimage.transform import pyramid_gaussian
 from sklearn.externals import joblib
 from skimage import color
 from imutils.object_detection import non_max_suppression
-from platform import system
-sp = '\\' if str(system()) == 'Windows' else '/'
 
 # Define HOG Parameters
 # For weaker HOG, orientations = 8, pixels per cell = (16,16), cells per block = (1,1)
@@ -34,14 +32,14 @@ scale_power = 0
 detections = []
 
 # Read the image you want to detect the object in:
-img = cv2.imread("original_images" + sp + "8.jpg")
+img = cv2.imread(os.path.join("data", "original_images", "1.jpg"))
 
 # Try it with image resized if the image is too big
 img = cv2.resize(img, (900, 400)) # commenting this line out for default size
 
 # Size of the sliding window (MUST be same as the size of the image in the training data)
-window_size = (25, 50)
-downscale = 1.05
+window_size = (30, 30)
+downscale = 1.01
 
 # Apply sliding window:
 for resized in pyramid_gaussian(img, downscale=downscale): # Loop over each resize image
@@ -65,21 +63,19 @@ for resized in pyramid_gaussian(img, downscale=downscale): # Loop over each resi
     
 clone = resized.copy()
 for (x_tl, y_tl, _, w, h) in detections:
-    print("{} {} {} {}".format(x_tl, y_tl, w, h))
     x_br = x_tl + w
     y_br = y_tl + h
-    cv2.rectangle(img, (x_tl, y_tl), (x_br, y_br), (0, 0, 255), thickness = 2)
 
 # Non-maximum supression on detected boxes
 rects = np.array([[x, y, x + w, y + h] for (x, y, _, w, h) in detections])
 sc = [score[0] for (x, y, score, w, h) in detections]
-print("Detection confidence score: ", sc)
-sc = np.array(sc)
 pick = non_max_suppression(rects, probs = sc, overlapThresh = 0.3)
         
 for (xA, yA, xB, yB) in pick:
-    cv2.rectangle(img, (xA, yA), (xB, yB), (0, 255, 0), 2)
-cv2.imshow("Raw Detections after NMS", img)
+    cv2.rectangle(img, (xA, yA), (xB, yB), (255,0,0), 2)
+
+cv2.namedWindow("Where is Waldo?", cv2.WINDOW_NORMAL)
+cv2.imshow("Where is Waldo?", img)
 cv2.waitKey(0) & 0xFF 
 
 
