@@ -1,6 +1,5 @@
 import os
 import sys
-from platform import system
 from PIL import Image
 
 folder = sys.argv[1]

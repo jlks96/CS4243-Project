@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 import os
-from platform import system
 
 info = open('info2.dat', 'a')
 training_set = open(os.path.join('..', 'datasets', 'ImageSets', 'train.txt'))
