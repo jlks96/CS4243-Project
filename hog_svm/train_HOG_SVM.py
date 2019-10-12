@@ -5,11 +5,9 @@ import cv2
 import os
 from skimage.feature import hog
 from sklearn.preprocessing import LabelEncoder
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 from sklearn.kernel_approximation import Nystroem
 from PIL import Image
-from platform import system
-sp = '\\' if str(system()) == 'Windows' else '/'
 
 # Define parameters of HOG feature extraction
 orientations = 9
@@ -18,9 +16,9 @@ cells_per_block = (2, 2)
 threshold = 0.3
 
 # Define path to images:
-pos_im_path = "pos_data"
+pos_im_path = os.path.join("data", "waldo", "head")
 # Define the same for negatives
-neg_im_path= "neg_data"
+neg_im_path= os.path.join("data", "neg_data")
 
 # Read the image files:
 pos_im_listing = os.listdir(pos_im_path) # read all the files in the positive image path (so all the required images)
@@ -33,8 +31,8 @@ labels = []
 
 # Compute HOG features and label them:
 for file in pos_im_listing:
-    img = Image.open(pos_im_path + sp + file)
-    img = img.resize((25, 50))
+    img = Image.open(os.path.join(pos_im_path, file))
+    img = img.resize((30, 30))
     gray = img.convert('L') # convert the image to grayscale
     # Calculate HOG for positive features
     fd = hog(gray, orientations, pixels_per_cell, cells_per_block, block_norm='L2', feature_vector=True)# fd= feature descriptor
@@ -43,8 +41,8 @@ for file in pos_im_listing:
     
 # Same for the negative images
 for file in neg_im_listing:
-    img= Image.open(neg_im_path + sp + file)
-    img = img.resize((25, 50))
+    img= Image.open(os.path.join(neg_im_path, file))
+    img = img.resize((30, 30))
     gray= img.convert('L')
     # Calculate the HOG for negative features
     fd = hog(gray, orientations, pixels_per_cell, cells_per_block, block_norm='L2', feature_vector=True) 
@@ -56,7 +54,7 @@ labels = le.fit_transform(labels)
 
 # Train the linear SVM
 print("Training Linear SVM classifier...")
-model = LinearSVC()
+model = SVC(gamma='scale')
 model.fit(data, labels)
 print("Training done!")
 
