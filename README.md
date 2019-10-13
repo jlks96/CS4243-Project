@@ -74,6 +74,32 @@ python OpenCV_train_HOG_SVM.py
 
 *Code adapted from (https://github.com/SamPlvs/Object-detection-via-HOG-SVM)*
 
+## Template Matching
+
+### Pure template matching
+
+```
+python pure_tm.py -t <template folder> -i <3_digit_image_idx>
+```
+
+Output image would be in `template_matching/results` folder
+
+### Scoring the result from cascade classifier
+
+```
+python base_line_scoring.py -t <template folder> -i <3_digit_image_idx>
+```
+
+This script takes `template_matching/baseline.txt` as input and would output a csv file to `template_matching/baseline`.
+
+Inside `baseline` folder:
+
+```
+python baseline2result.py -b <baseline_csv_file>
+```
+
+This script converts baseline csv file to actual baseline.txt file.
+
 ### References
 - Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
 - [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)
