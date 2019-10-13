@@ -39,12 +39,6 @@ base_line = base_line[base_line['id']==args["image"]]
 base_line = base_line[base_line['score']>threshold]
 base_line['tm_score']= 0.0
 base_line.index = range(len(base_line))
-# print(base_line)
-# print(base_line.iloc[i]['tl_x'])
-# print(base_line.iloc[0])
-max_min_scaler = lambda x : (x-np.min(x))/(np.max(x)-np.min(x))
-
-# print(base_line)
 
 image = cv2.imread(image_path)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -54,8 +48,6 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 for i in tqdm(range(len(base_line))):
     final_score = 0.0
     p = base_line.iloc[i]
-    # p['tl_x']
-    # print(p['tl_x'],p['br_x'], p['tl_y'],p['br_y'])
     patch = gray[p['tl_x']:p['br_x'], p['tl_y']:p['br_y']]
     (pH, pW) = patch.shape
     # print(pH, pW)
