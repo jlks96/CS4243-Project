@@ -12,7 +12,7 @@ import os
 sp = '\\' if str(system()) == 'Windows' else '/'
 # ts_path = 'templates/selected/waldo/head'
 ts_path = 'templates/selected/single'
-bl_path = 'baseline/baseline.txt'
+bl_path = 'baseline.txt'
 threshold = 0 # threshold the cascade score
 iteration = 5 # scale iteration
 canny = True
@@ -52,7 +52,7 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 
 for i in tqdm(range(len(base_line))):
-    total_score = 0.0
+    final_score = 0.0
     p = base_line.iloc[i]
     # p['tl_x']
     # print(p['tl_x'],p['br_x'], p['tl_y'],p['br_y'])
@@ -85,9 +85,11 @@ for i in tqdm(range(len(base_line))):
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(res)
             if maxVal > best_score:
                 best_score = maxVal
-        total_score += best_score
+        if best_score > final_score:
+            final_score = best_score
+        # total_score += best_score
     # base_line.iloc[i]['tm_score'] = total_score
-    base_line.at[i,'tm_score'] = total_score
+    base_line.at[i,'tm_score'] = final_score
 
 mmax = np.max(base_line['tm_score'])
 mmin = np.min(base_line['tm_score'])
