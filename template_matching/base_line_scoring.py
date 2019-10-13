@@ -13,7 +13,8 @@ sp = '\\' if str(system()) == 'Windows' else '/'
 # ts_path = 'templates/selected/waldo/head'
 ts_path = 'templates/selected/single'
 bl_path = 'baseline/baseline.txt'
-threshold = 0.6 # threshold the cascade score
+threshold = 0 # threshold the cascade score
+iteration = 5 # scale iteration
 canny = True
 
 base_line = pd.read_csv(bl_path, names=['id', 'score','tl_y','tl_x',  'br_y','br_x'], 
@@ -29,6 +30,7 @@ ap.add_argument("-i", "--image", required=True,
 args = vars(ap.parse_args())
 
 ts_path = args["template"] if args["template"] else ts_path
+templ_name = os.path.basename(ts_path)
 t_paths = list(glob.glob(ts_path + "/*.jpg"))
 
 image_path = '../datasets/JPEGImages/'+args["image"]+'.jpg'
@@ -70,7 +72,7 @@ for i in tqdm(range(len(base_line))):
         scale_width = p_ratio > t_ratio
         # if p_ratio > t_ratio
         best_score = 0.0
-        for scale in np.linspace(1, 2, 3)[::-1]:
+        for scale in np.linspace(1, 2, iteration)[::-1]:
             # print(scale)
             rz_patch = None
             if scale_width:
@@ -91,4 +93,4 @@ mmax = np.max(base_line['tm_score'])
 mmin = np.min(base_line['tm_score'])
 base_line['tm_score'] = base_line['tm_score'].apply(lambda x:(x-mmin)/(mmax-mmin))
 
-base_line.to_csv('baseline/baseline_'+args['image']+'.csv', index=False, header=False)
+base_line.to_csv('baseline/baseline_'+args['image']+'_'+templ_name+'.csv', index=False, header=False)
