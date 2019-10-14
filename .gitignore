@@ -135,5 +135,7 @@ dmypy.json
 datasets/PositiveImages/*.jpg
 template_matching/results/*.jpg
 cascadeclassifier/training_dataset/
+cascadeclassifier/visualisation/
 hog_svm/data/
 *.DS_Store
+
