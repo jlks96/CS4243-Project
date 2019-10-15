@@ -100,7 +100,46 @@ python baseline2result.py -b <baseline_csv_file>
 
 This script converts baseline csv file to actual baseline.txt file.
 
-### References
+## Official Training for Cascade Classifier
+
+*Note: k = 10 for cross-validation.*
+
+### Generate data required for training
+
+```
+python data_generator.py
+```
+
+No arguments needed. Only needed to generate once.
+A `data` folder will be created, which will contain all the necessary training files/data needed.
+
+Folder structure: `data -> k_idx -> character -> body_part -> bg/info files`
+
+### Training
+
+```
+python trainer.py -w <width> -bt <booster> -minHitRate <minHitRate> -maxFalseAlarmRate <maxFalseAlarmRate> -mode <mode> -numPos <#_pos_egs> -numNeg <#_neg_egs>
+```
+
+One execution will train for all characters and body parts.
+The trainer will automatically run from 10 to 20 number of stages.
+A `trained_models` folder will be created, which will contain all the trained models.
+
+Folder structure: `trained_models -> parameters -> k_idx -> character -> body_part -> cascade.xml`
+
+### Validation
+
+```
+python validator.py
+```
+
+Validator will generate and evaluate baselines for all models contained in the `trained_models` folder
+A `baseline` folder will be created, which will contain all the baselines.
+A `eval.txt` file will be generated which contains the average mAP for all the models (aggregated according to training parameters).
+
+Folder structure: `baseline -> parameters -> k_idx -> waldo.txt + wenda.txt + wizard.txt`
+
+## References
 - Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
 - [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)
 
