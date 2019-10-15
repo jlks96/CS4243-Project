@@ -137,5 +137,9 @@ template_matching/results/*.jpg
 cascadeclassifier/training_dataset/
 cascadeclassifier/visualisation/
 hog_svm/data/
+training/baseline/
+training/data/
+training/trained_models
+training/cache_anno/
 *.DS_Store
 
