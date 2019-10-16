@@ -124,8 +124,10 @@ python trainer.py -w <width> -bt <booster> -minHitRate <minHitRate> -maxFalseAla
 One execution will train for all characters and body parts.
 The trainer will automatically run from 10 to 20 number of stages.
 A `trained_models` folder will be created, which will contain all the trained models.
+`numPos` is specific for stage 0. For subsequent stages, more postive examples will be consumed.
 
 Folder structure: `trained_models -> parameters -> k_idx -> character -> body_part -> cascade.xml`
+*Note: parameters format for folder name is `numStage_w_bt_minHitRate_maxFalseAlarmRate_mode`*
 
 ### Validation
 
