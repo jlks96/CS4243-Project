@@ -19,9 +19,7 @@ def generate_baselines(validation_set, test_img_path, i):
             for part in ["body", "full", "head"]:
         
                 with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
-                    part = "head"
                     model = os.path.join("trained_models", param, str(i), character, part, "cascade.xml")
-                    print(model)
                     cascade = cv2.CascadeClassifier(model)
                     # Find in all subdir of test_img_path
                     for root, _, files in os.walk(test_img_path):
