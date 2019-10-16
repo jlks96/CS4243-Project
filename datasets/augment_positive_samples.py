@@ -45,14 +45,14 @@ Functions imported from https://github.com/aleju/imgaug
 source_dir = "PositiveSamples"
 save_dir = "PositiveSamples"
 
-characters = ["\\waldo", "\\wenda", "\\wizard"]
-components = ["\\head", "\\body"]
+characters = ["\\wizard"]
+components = ["\\head", "\\body", "\\full"]
 
 
 #Set these boolean flags to True to perform respective functions
-do_rotate = True
+do_rotate = False
 do_blur = True
-do_flip = True
+do_flip = False
 
 #Counter for number of images edited respectively
 rotated_images = 0
@@ -74,7 +74,7 @@ flipped_images = 0
 """
 def rotate(image, image_file, image_id, save_folder):
     
-    angles = [-30, -15, 15, 30]
+    angles = [-30, -25, -20, -15, -10, -5, 5, 10, 15, 20, 25, 30]
 
     image_list = [image]
     index = 0
@@ -104,7 +104,7 @@ def rotate(image, image_file, image_id, save_folder):
 """
 def gauss_blur(image, image_file, image_id, save_folder):    
     
-    sigmas = [0.5, 1, 1.5]
+    sigmas = [0.5, 0.75, 1, 1.25, 1.5]
     image_list = [image]
     index = 0
 
@@ -148,8 +148,8 @@ def horzflip(image, image_file, image_id, save_folder):
 
 for character in characters:
     for component in components:
-        source_folder = source_dir + character + component 
-        save_folder = save_dir + character + "_augmented" + component
+        source_folder = source_dir + character + component + "\\original"
+        save_folder = save_dir + character + component
         for path, subdirs, files in os.walk(source_folder):
             for filename in files:
                 name = Path(filename)
