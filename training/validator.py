@@ -9,6 +9,16 @@ def generate_baselines(validation_set, test_img_path, i):
     _, params, _ = next(os.walk("trained_models"))
     
     for param in params:
+        # Determine parameters
+        param_list = param.split("_")
+        w = param_list[0]
+        bt = param_list[1]
+        min_hit_rate = param_list[2]
+        max_false_alarm_rate = param_list[3]
+        mode = param_list[4]
+        num_pos = 100 # Placeholder value
+        num_neg = 200 # Placeholder value
+        
         baseline_folder = os.path.join("baseline", param, str(i))
 
         # Create folder if doesn't exist
@@ -16,35 +26,54 @@ def generate_baselines(validation_set, test_img_path, i):
             os.makedirs(baseline_folder)
         
         for character in ["waldo", "wenda", "wizard"]:
-            for part in ["body", "full", "head"]:
-        
-                with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
-                    model = os.path.join("trained_models", param, str(i), character, part, "cascade.xml")
-                    cascade = cv2.CascadeClassifier(model)
-                    # Find in all subdir of test_img_path
-                    for root, _, files in os.walk(test_img_path):
-                        for filename in files:
-                            if filename[:3] in validation_set:
-                                # Runs detection on all validation images
-                                img = cv2.imread(os.path.join(root, filename))
-                                img_idx = filename[:3]
+            for part, h_w_scale in zip(["body", "full", "head"], [1.5, 2.5, 1]):
+                # Set height according to the width and body part
+                # body: h = 1.5w, full: h = 2.5w, head: h = w
+                h = float(w) * h_w_scale
 
-                                detections, _, levelWeights = cascade.detectMultiScale3(img, scaleFactor=1.1, outputRejectLevels=True)
+                # Determine paths
+                data_folder = os.path.join("data", str(i), character, part)
+                pos_vec_path = os.path.join(data_folder, w, "pos.vec")
+                bg_path = os.path.join(data_folder, "bg.txt")
+                model_folder = os.path.join("trained_models", param, str(i), character, part)
 
-                                print("Detections done for image {}!".format(img_idx))
-                            
-                                for (x, y, w, h), levelWeight in zip(detections, levelWeights):
-                                    # Computes confidence score using sigmoid function
-                                    if levelWeight[0] >= 0:
-                                        z = math.exp(-levelWeight[0])
-                                        confidence_score = 1 / (1 + z)
-                                    else:
-                                        z = math.exp(levelWeight[0])
-                                        confidence_score = z / (1 + z)
+                # Evaluate for numStages = 10 to 20
+                for num_stage in range(10, 21):
+                    # Use training command to set numStages
+                    train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {} \
+                        -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
+                            model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
+                    os.system(train_cmd)
 
-                                # Outputs to baseline.txt
-                                bl.write(" ".join(map(str, [img_idx, confidence_score, x, y, x + w, y + h])) + "\n")
-                bl.close()
+                    # Evaluation of model
+                    with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
+                        model = os.path.join(model_folder, "cascade.xml")
+                        cascade = cv2.CascadeClassifier(model)
+
+                        # Find in all subdir of test_img_path
+                        for root, _, files in os.walk(test_img_path):
+                            for filename in files:
+                                if filename[:3] in validation_set:
+                                    # Runs detection on all validation images
+                                    img = cv2.imread(os.path.join(root, filename))
+                                    img_idx = filename[:3]
+
+                                    detections, _, levelWeights = cascade.detectMultiScale3(img, scaleFactor=1.1, outputRejectLevels=True)
+
+                                    print("Detections done for image {}!".format(img_idx))
+                                
+                                    for (x, y, w, h), levelWeight in zip(detections, levelWeights):
+                                        # Computes confidence score using sigmoid function
+                                        if levelWeight[0] >= 0:
+                                            z = math.exp(-levelWeight[0])
+                                            confidence_score = 1 / (1 + z)
+                                        else:
+                                            z = math.exp(levelWeight[0])
+                                            confidence_score = z / (1 + z)
+
+                                    # Outputs to baseline.txt
+                                    bl.write(" ".join(map(str, [img_idx, confidence_score, x, y, x + w, y + h])) + "\n")
+                    bl.close()
 
 def evaluate_baselines(anno_path, train_txt_path):
     # Get all params folder
