@@ -141,5 +141,6 @@ training/baseline/
 training/data/
 training/trained_models
 training/cache_anno/
+training/*.txt
 *.DS_Store
 
