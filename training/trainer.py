@@ -26,23 +26,25 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 os.system(create_samples_cmd)
 
                 # Train cascade classifier
-                for num_stage in range(10, 21): # Iterate from 10 to 20 stages
-                    # folder name is "numStage_w_bt_minHitRate_maxFalseAlarmRate_mode"
-                    model_folder = os.path.join("trained_models", "{}_{}_{}_{}_{}_{}".format(
-                        num_stage, w, bt, min_hit_rate, max_false_alarm_rate, mode), str(i), character, part)
+                # Train to 20 stages
+                num_stage = 20
+                
+                # Folder name is "w_bt_minHitRate_maxFalseAlarmRate_mode"
+                model_folder = os.path.join("trained_models", "{}_{}_{}_{}_{}".format(
+                    w, bt, min_hit_rate, max_false_alarm_rate, mode), str(i), character, part)
 
-                    if not os.path.exists(model_folder):
-                        os.makedirs(model_folder)
+                if not os.path.exists(model_folder):
+                    os.makedirs(model_folder)
 
-                    # Actual training with full parameters
-                    train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {} \
-                        -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
-                            model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
-                    
-                    # # Basic training w/o -bt -minHitRate -maxFalseAlarmRate -mode
-                    # train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {}".format(
-                    #         model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w)
-                    os.system(train_cmd)
+                # Actual training with full parameters
+                train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {} \
+                    -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
+                        model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
+                
+                # # Basic training w/o -bt -minHitRate -maxFalseAlarmRate -mode
+                # train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {}".format(
+                #         model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w)
+                os.system(train_cmd)
 
 if __name__ == "__main__":
     parser = ArgumentParser(description='trainer for cascade classifier.')
