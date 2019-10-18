@@ -46,6 +46,21 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 #         model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w)
                 os.system(train_cmd)
 
+def getNumPos(minHitRate):
+    minNumPos = float('inf')
+    buffer_factor = 0.95
+    num_stage = 20
+    for root, _, files in os.walk("data"): # Find in data folder
+        for filename in files:
+            if filename == "info.dat": # Find all info.dat
+                with open(os.path.join(root, filename), "r") as f:
+                    currNumPos = len(f.readlines())
+                    if currNumPos < minNumPos: minNumPos = currNumPos 
+    
+    numPos = (minNumPos * buffer_factor) / (1 + minHitRate * num_stage)
+    print("Calculated numPos: {}".format(numPos))
+    return numPos
+
 if __name__ == "__main__":
     parser = ArgumentParser(description='trainer for cascade classifier.')
     parser.add_argument('-w', required=True, help="width of window")
@@ -53,11 +68,12 @@ if __name__ == "__main__":
     parser.add_argument('-minHitRate', required=True, help="minimum recall: TP/(TP+FN)")
     parser.add_argument('-maxFalseAlarmRate', required=True, help="maximum false positive rate: FP/(FP+TN)")
     parser.add_argument('-mode', required=True, help="mode of haar features")
-    parser.add_argument('-numPos', required=True, help="number of positive examples")
-    parser.add_argument('-numNeg', required=True, help="number of negative examples")
     args = parser.parse_args()
 
     # Constants
     _k = 10 # k-fold cross validation
 
-    train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, args.numPos, args.numNeg, _k)
+    numPos = getNumPos(float(args.minHitRate))
+    numNeg = 2 * numPos
+
+    train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
