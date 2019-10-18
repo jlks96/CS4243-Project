@@ -118,13 +118,14 @@ Folder structure: `data -> k_idx -> character -> body_part -> bg/info files`
 ### Training
 
 ```
-python trainer.py -w <width> -bt <booster> -minHitRate <minHitRate> -maxFalseAlarmRate <maxFalseAlarmRate> -mode <mode> -numPos <#_pos_egs> -numNeg <#_neg_egs>
+python trainer.py -w <width> -bt <booster> -minHitRate <minHitRate> -maxFalseAlarmRate <maxFalseAlarmRate> -mode <mode>
 ```
 
 One execution will train for all characters and body parts.
 The trainer will train for numStages = 20.
 A `trained_models` folder will be created, which will contain all the trained models.
 `numPos` is specific for stage 0. For subsequent stages, more postive examples will be consumed.
+`numPos` and `numNeg` will be automatically calculated based on the examples we have.
 
 Folder structure: `trained_models -> parameters -> k_idx -> character -> body_part -> cascade.xml`
 *Note: parameters format for folder name is `w_bt_minHitRate_maxFalseAlarmRate_mode`*
