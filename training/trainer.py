@@ -46,7 +46,7 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 #         model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w)
                 os.system(train_cmd)
 
-def getNumPos(minHitRate):
+def get_num_pos(minHitRate):
     minNumPos = float('inf')
     buffer_factor = 0.95
     num_stage = 20
@@ -73,7 +73,9 @@ if __name__ == "__main__":
     # Constants
     _k = 10 # k-fold cross validation
 
-    numPos = getNumPos(float(args.minHitRate))
-    numNeg = 2 * numPos
+    # numPos = get_num_pos(float(args.minHitRate))
+    # numNeg = 2 * numPos
+    numPos = 300
+    numNeg = 300
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
