@@ -57,7 +57,7 @@ def getNumPos(minHitRate):
                     currNumPos = len(f.readlines())
                     if currNumPos < minNumPos: minNumPos = currNumPos 
     
-    numPos = (minNumPos * buffer_factor) / (1 + minHitRate * num_stage)
+    numPos = (minNumPos * buffer_factor) / (1 + (1 - minHitRate) * num_stage)
     print("Calculated numPos: {}".format(numPos))
     return numPos
 
