@@ -71,11 +71,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Constants
-    _k = 5 # k-fold cross validation
+    _k = 2 # k-fold cross validation
 
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 200
-    numNeg = 200
+    numPos = 100
+    numNeg = 100
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)

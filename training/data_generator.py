@@ -54,7 +54,7 @@ def generate_training_validation_set(training_validation_set, k):
 
 if __name__ == "__main__":
     # Constants
-    _k = 5 # k-fold cross validation
+    _k = 2 # k-fold cross validation
     _training_txt_path = os.path.join("..", "datasets", "ImageSets", "train.txt") # Dir of train.txt
     _neg_path = os.path.join("..", "datasets", "NegativeSamples") # Dir of NegativeSamples
     _pos_path = os.path.join("..", "datasets", "PositiveSamples") # Dir of PositiveSamples

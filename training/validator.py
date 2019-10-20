@@ -103,7 +103,7 @@ def evaluate_baselines(anno_path, train_txt_path):
 
 if __name__ == "__main__":
     # Constants
-    _k = 5
+    _k = 2
     _test_img_path = os.path.join("..", "datasets", "JPEGImages")
     _anno_path = os.path.join("..", "datasets", "Annotations", "{}.xml")
     _train_txt_path = os.path.join("..", "datasets", "ImageSets", "train.txt")

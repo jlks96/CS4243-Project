@@ -102,7 +102,7 @@ This script converts baseline csv file to actual baseline.txt file.
 
 ## Official Training for Cascade Classifier
 
-*Note: k = 5 for cross-validation.*
+*Note: k = 2 for cross-validation.*
 
 ### Generate data required for training
 
