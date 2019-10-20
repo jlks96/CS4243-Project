@@ -5,7 +5,7 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
 
     # Folder structure: data -> i -> character -> part -> trained_model
     for character in ["waldo", "wenda", "wizard"]:
-        for part, h_w_scale in zip(["body", "full", "head"], [1.5, 2.5, 1]):
+        for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
 
             # Set height according to the width and body part
             # body: h = 1.5w, full: h = 2.5w, head: h = w
@@ -26,8 +26,8 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 os.system(create_samples_cmd)
 
                 # Train cascade classifier
-                # Train to 20 stages
-                num_stage = 20
+                # Train to 17 stages
+                num_stage = 17
                 
                 # Folder name is "w_bt_minHitRate_maxFalseAlarmRate_mode"
                 model_folder = os.path.join("trained_models", "{}_{}_{}_{}_{}".format(
@@ -49,7 +49,7 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
 def get_num_pos(minHitRate):
     minNumPos = float('inf')
     buffer_factor = 0.95
-    num_stage = 20
+    num_stage = 17
     for root, _, files in os.walk("data"): # Find in data folder
         for filename in files:
             if filename == "info.dat": # Find all info.dat
@@ -71,11 +71,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Constants
-    _k = 10 # k-fold cross validation
+    _k = 5 # k-fold cross validation
 
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 300
-    numNeg = 300
+    numPos = 200
+    numNeg = 200
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
