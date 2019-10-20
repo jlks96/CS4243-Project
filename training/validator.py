@@ -9,6 +9,7 @@ def generate_baselines(validation_set, test_img_path, i):
     _, params, _ = next(os.walk("trained_models"))
     
     for param in params:
+        print(param)
         # Determine parameters
         param_list = param.split("_")
         w = param_list[0]
@@ -16,8 +17,8 @@ def generate_baselines(validation_set, test_img_path, i):
         min_hit_rate = param_list[2]
         max_false_alarm_rate = param_list[3]
         mode = param_list[4]
-        num_pos = 200 # Placeholder value
-        num_neg = 200 # Placeholder value
+        num_pos = 100 # Placeholder value
+        num_neg = 100 # Placeholder value
         
         baseline_folder = os.path.join("baseline", param, str(i))
 
@@ -33,23 +34,32 @@ def generate_baselines(validation_set, test_img_path, i):
 
                 # Determine paths
                 data_folder = os.path.join("data", str(i), character, part)
-                pos_vec_path = os.path.join(data_folder, w, "pos.vec")
+                pos_vec_path = os.path.join(data_folder, str(w), "pos.vec")
                 bg_path = os.path.join(data_folder, "bg.txt")
                 model_folder = os.path.join("trained_models", param, str(i), character, part)
 
                 # Evaluate for numStages = 10 to 17
-                for num_stage in range(10, 18):
+                actualNumStages = 0
+                
+                for dirpath, dirnames, files in os.walk(model_folder):
+                    for f in files:
+                        if "stage" in f:
+                            actualNumStages += 1
+                print(actualNumStages, "stages")
+                
+                for num_stage in range(10, actualNumStages):
                     # Use training command to set numStages
                     train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {} \
                         -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
                             model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
                     os.system(train_cmd)
-
+                    
                     # Evaluation of model
                     with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
                         model = os.path.join(model_folder, "cascade.xml")
                         cascade = cv2.CascadeClassifier(model)
 
+                        
                         # Find in all subdir of test_img_path
                         for root, _, files in os.walk(test_img_path):
                             for filename in files:
@@ -62,7 +72,7 @@ def generate_baselines(validation_set, test_img_path, i):
 
                                     print("Detections done for image {}!".format(img_idx))
                                 
-                                    for (x, y, w, h), levelWeight in zip(detections, levelWeights):
+                                    for (x, y, wi, hi), levelWeight in zip(detections, levelWeights):
                                         # Computes confidence score using sigmoid function
                                         if levelWeight[0] >= 0:
                                             z = math.exp(-levelWeight[0])
@@ -71,8 +81,8 @@ def generate_baselines(validation_set, test_img_path, i):
                                             z = math.exp(levelWeight[0])
                                             confidence_score = z / (1 + z)
 
-                                    # Outputs to baseline.txt
-                                    bl.write(" ".join(map(str, [img_idx, confidence_score, x, y, x + w, y + h])) + "\n")
+                                        # Outputs to baseline.txt
+                                        bl.write(" ".join(map(str, [img_idx, confidence_score, x, y, x + wi, y + hi])) + "\n")
                     bl.close()
 
 def evaluate_baselines(anno_path, train_txt_path):
