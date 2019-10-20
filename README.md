@@ -102,7 +102,7 @@ This script converts baseline csv file to actual baseline.txt file.
 
 ## Official Training for Cascade Classifier
 
-*Note: k = 10 for cross-validation.*
+*Note: k = 5 for cross-validation.*
 
 ### Generate data required for training
 
@@ -122,7 +122,7 @@ python trainer.py -w <width> -bt <booster> -minHitRate <minHitRate> -maxFalseAla
 ```
 
 One execution will train for all characters and body parts.
-The trainer will train for numStages = 20.
+The trainer will train for numStages = 17.
 A `trained_models` folder will be created, which will contain all the trained models.
 `numPos` is specific for stage 0. For subsequent stages, more postive examples will be consumed.
 `numPos` and `numNeg` will be automatically calculated based on the examples we have.
@@ -137,7 +137,7 @@ python validator.py
 ```
 
 Validator will generate and evaluate baselines for all models contained in the `trained_models` folder
-The validator will evaluate for numStages=10 to 20.
+The validator will evaluate for numStages=10 to 17.
 A `baseline` folder will be created, which will contain all the baselines.
 A `eval.txt` file will be generated which contains the average mAP for all the models (aggregated according to training parameters).
 
