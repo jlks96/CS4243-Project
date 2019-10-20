@@ -16,7 +16,7 @@ def generate_baselines(validation_set, test_img_path, i):
         min_hit_rate = param_list[2]
         max_false_alarm_rate = param_list[3]
         mode = param_list[4]
-        num_pos = 100 # Placeholder value
+        num_pos = 200 # Placeholder value
         num_neg = 200 # Placeholder value
         
         baseline_folder = os.path.join("baseline", param, str(i))
@@ -26,7 +26,7 @@ def generate_baselines(validation_set, test_img_path, i):
             os.makedirs(baseline_folder)
         
         for character in ["waldo", "wenda", "wizard"]:
-            for part, h_w_scale in zip(["body", "full", "head"], [1.5, 2.5, 1]):
+            for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
                 # Set height according to the width and body part
                 # body: h = 1.5w, full: h = 2.5w, head: h = w
                 h = float(w) * h_w_scale
@@ -37,8 +37,8 @@ def generate_baselines(validation_set, test_img_path, i):
                 bg_path = os.path.join(data_folder, "bg.txt")
                 model_folder = os.path.join("trained_models", param, str(i), character, part)
 
-                # Evaluate for numStages = 10 to 20
-                for num_stage in range(10, 21):
+                # Evaluate for numStages = 10 to 17
+                for num_stage in range(10, 18):
                     # Use training command to set numStages
                     train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {} \
                         -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
@@ -103,7 +103,7 @@ def evaluate_baselines(anno_path, train_txt_path):
 
 if __name__ == "__main__":
     # Constants
-    _k = 10
+    _k = 5
     _test_img_path = os.path.join("..", "datasets", "JPEGImages")
     _anno_path = os.path.join("..", "datasets", "Annotations", "{}.xml")
     _train_txt_path = os.path.join("..", "datasets", "ImageSets", "train.txt")
