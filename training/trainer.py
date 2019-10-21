@@ -20,8 +20,9 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 bg_path = os.path.join(data_folder, "bg.txt")
 
                 # Create positive examples (pos.vec)
-                info = open(info_path, "r")
-                num_posv = len(info.readlines()) # Create as many pos for pos.vec as in info.dat
+                # info = open(info_path, "r")
+                # num_posv = len(info.readlines()) # Create as many pos for pos.vec as in info.dat
+                num_posv = 500 # hardcode for validation
                 create_samples_cmd = "opencv_createsamples -info {} -num {} -w {} -h {} -vec {}".format(
                     info_path, num_posv, w, h, pos_vec_path)
                 os.system(create_samples_cmd)
@@ -77,8 +78,8 @@ if __name__ == "__main__":
 
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 200
-    numNeg = 200
+    numPos = 300
+    numNeg = 300
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
     print("Time taken:", time.time() - start)
