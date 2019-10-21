@@ -17,8 +17,8 @@ def generate_baselines(validation_set, test_img_path, i):
         min_hit_rate = param_list[2]
         max_false_alarm_rate = param_list[3]
         mode = param_list[4]
-        num_pos = 100 # Placeholder value
-        num_neg = 100 # Placeholder value
+        num_pos = 200 # Placeholder value
+        num_neg = 200 # Placeholder value
         
         baseline_folder = os.path.join("baseline", param, str(i))
 

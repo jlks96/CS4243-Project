@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 100
-    numNeg = 100
+    numPos = 200
+    numNeg = 200
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
