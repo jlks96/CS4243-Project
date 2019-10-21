@@ -48,14 +48,13 @@ def generate_baselines(validation_set, test_img_path, i):
                         -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
                             model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
                     os.system(train_cmd)
-                    
-                    # Evaluation of model
-                    baseline_folder = os.path.join("baseline", "{}_{}".format(num_stage,param), str(i))
-
-                    # Create folder if doesn't exist
+                
+                    # Create baseline folder if doesn't exist
+                    baseline_folder = os.path.join("baseline", "{}_{}".format(num_stage, param), str(i))
                     if not os.path.exists(baseline_folder):
                         os.makedirs(baseline_folder)
                     
+                    # Evaluation of model
                     with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
                         model = os.path.join(model_folder, "cascade.xml")
                         cascade = cv2.CascadeClassifier(model)
