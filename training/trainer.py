@@ -1,4 +1,5 @@
 import os
+import time
 from argparse import ArgumentParser
 
 def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k): # Training parameters
@@ -62,6 +63,7 @@ def get_num_pos(minHitRate):
     return numPos
 
 if __name__ == "__main__":
+    start = time.time()
     parser = ArgumentParser(description='trainer for cascade classifier.')
     parser.add_argument('-w', required=True, help="width of window")
     parser.add_argument('-bt', required=True, help="booster type")
@@ -79,3 +81,4 @@ if __name__ == "__main__":
     numNeg = 200
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
+    print("Time taken:", time.time() - start)

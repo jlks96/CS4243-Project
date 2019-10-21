@@ -1,6 +1,7 @@
 import cv2
 import os
 import math
+import time
 from voc_eval import *
 
 def generate_baselines(validation_set, test_img_path, i):
@@ -19,12 +20,6 @@ def generate_baselines(validation_set, test_img_path, i):
         mode = param_list[4]
         num_pos = 200 # Placeholder value
         num_neg = 200 # Placeholder value
-        
-        baseline_folder = os.path.join("baseline", param, str(i))
-
-        # Create folder if doesn't exist
-        if not os.path.exists(baseline_folder):
-            os.makedirs(baseline_folder)
         
         for character in ["waldo", "wenda", "wizard"]:
             for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
@@ -55,6 +50,12 @@ def generate_baselines(validation_set, test_img_path, i):
                     os.system(train_cmd)
                     
                     # Evaluation of model
+                    baseline_folder = os.path.join("baseline", "{}_{}".format(num_stage,param), str(i))
+
+                    # Create folder if doesn't exist
+                    if not os.path.exists(baseline_folder):
+                        os.makedirs(baseline_folder)
+                    
                     with open(os.path.join(baseline_folder,  "{}.txt".format(character)), "a") as bl:
                         model = os.path.join(model_folder, "cascade.xml")
                         cascade = cv2.CascadeClassifier(model)
@@ -113,6 +114,7 @@ def evaluate_baselines(anno_path, train_txt_path):
 
 if __name__ == "__main__":
     # Constants
+    start = time.time()
     _k = 2
     _test_img_path = os.path.join("..", "datasets", "JPEGImages")
     _anno_path = os.path.join("..", "datasets", "Annotations", "{}.xml")
@@ -130,5 +132,5 @@ if __name__ == "__main__":
 
     # Evaluate baselines
     evaluate_baselines(_anno_path, _train_txt_path)
-    
+    print("Time taken:", time.time() - start)
 
