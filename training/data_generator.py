@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 import numpy as np
 from argparse import ArgumentParser
 from PIL import Image
@@ -24,12 +25,26 @@ def generate_info(training_set, pos_path, storage_path, body_part):
 
     # Create info.dat
     info = open(os.path.join(storage_path, "info.dat"), "w")
+
+    aug_images = []
     for root, _, files in os.walk(pos_path): # Find in all subdir
         for filename in files:
-            if filename[:3] in training_set: # Index of image in training set
+            if len(filename) < 15 and filename[:3] in training_set: # Index of image in training set
+                # Output originals first
                 im = Image.open(os.path.join(root, filename))
                 width, height = im.size
                 info.write(" ".join(map(str, [os.path.join(os.path.relpath(root, storage_path), filename), 1, 0, 0, width, height])) + "\n")
+            elif filename[:3] in training_set:
+                # Append augmented images to list
+                aug_images.append((root, filename))
+
+    # Shuffle augmented images then output
+    random.shuffle(aug_images)
+    for img in aug_images:
+        im = Image.open(os.path.join(img[0], img[1]))
+        width, height = im.size
+        info.write(" ".join(map(str, [os.path.join(os.path.relpath(img[0], storage_path), img[1]), 1, 0, 0, width, height])) + "\n")
+
 
 def generate_training_validation_set(training_validation_set, k):
     # Prepare k training and validation sets
