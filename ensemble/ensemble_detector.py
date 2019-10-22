@@ -7,7 +7,7 @@ import glob
 import numpy as np
 from tqdm import tqdm
 from argparse import ArgumentParser
-from feature_extractor as fe
+import feature_extractor as fe
 
 def cascade_classify(classifier, image_path, image_idx):
     # Store list of detection results by cascade classifier
