@@ -4,10 +4,10 @@ import sys
 import math
 import scipy
 import glob
-from utils import resize
+import numpy as np
+from tqdm import tqdm
 from argparse import ArgumentParser
-# from cv_utils import template_matching as tm
-from cv_utils import feature_extractor as fe
+from feature_extractor as fe
 
 def cascade_classify(classifier, image_path, image_idx):
     # Store list of detection results by cascade classifier
@@ -35,24 +35,26 @@ def cascade_classify(classifier, image_path, image_idx):
 
     return results
 
-def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'euclidean', match_size=50):
+def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'correlation', match_size=50):
     # Option can be in ['hog', 'rgb', 'gray','']
     # Distance can be in ['euclidean', 'correlaion']
     t_paths = list(glob.glob(ts_path + "/*.jpg"))
     feature = fe.factory(option)
-    tm_result = []
+    if distance == 'correlation':
+        get_dis = scipy.spatial.distance.correlation
+    else:
+        get_dis = scipy.spatial.distance.euclidean
+    image = cv2.imread(image_path)
     with open(os.path.join(output_path, "baseline.txt"), "a") as bl:
-        image = cv2.imread(image_path)
         # Template matching operation
+        tm_result = []
         # For every patch detected
-        for pr in prelim_results:
-            print(pr)
+        for pr in tqdm(prelim_results):
             # xleft, xright, ytop, tbottom
             xl, xr, yt, yb = pr[2], pr[4], pr[3], pr[5]
             # crop the patch
             patch = image[yt:yb,xl:xr]
             # For evert template
-            dis = 0.0
             diss = []
             for t_path in t_paths:
                 template = cv2.imread(t_path)
@@ -63,13 +65,28 @@ def template_matching(prelim_results, image_path, ts_path, output_path, option='
                 p_feature = feature(patch)
                 t_feature = feature(template)
 
-                if distance == 'euclidean':
-                    dis = scipy.spatial.distance.euclidean(t_feature.flatten(), p_feature.flatten())
-                elif distance == 'correlation':
-                    dis = scipy.spatial.distance.correlation(t_feature.flatten(), p_feature.flatten())
+                dis = get_dis(t_feature.flatten(), p_feature.flatten())
                 diss.append(dis)
-            print(diss)
+            diss = np.array(diss)
+            tm_result.append((np.mean(diss), np.min(diss)))
+
+        # score = np.array([tr[-1]+tr[-2]*0.5 for tr in tm_result])
+        score = np.array([tr[-1] for tr in tm_result])
+        score = (np.max(score)-score)/(np.max(score)-np.min(score))
+
+        for (i, ((img_idx, _, x, y, xr, yb), tm_score)) in enumerate(zip(prelim_results, score)):
+            # print((img_idx, _, x, y, xr, yb), tm_score)
+            if (tm_score > 0.8):
+                # Outputs to baseline.txt
+                bl.write(" ".join(map(str, [img_idx, tm_score, x, y, xr, yb])) + "\n")
+                # Visualisation
+                cv2.rectangle(image, (x,y), (xr,yb), (255,0,0), 2)
+                cv2.putText(image, "%.3f" % tm_score, (x, y), cv2.FONT_ITALIC, 0.7, (255,0,0), 2)
+
     bl.close()
+    cv2.namedWindow("Where is Waldo?", cv2.WINDOW_NORMAL)
+    cv2.imshow("Where is Waldo?", image)
+    cv2.waitKey(0)
 
 
 if __name__ == "__main__":
