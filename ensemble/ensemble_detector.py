@@ -6,7 +6,7 @@ import scipy
 import glob
 from utils import resize
 from argparse import ArgumentParser
-from cv_utils import template_matching as tm
+# from cv_utils import template_matching as tm
 from cv_utils import feature_extractor as fe
 
 def cascade_classify(classifier, image_path, image_idx):
@@ -35,10 +35,12 @@ def cascade_classify(classifier, image_path, image_idx):
 
     return results
 
-def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'correlation', match_size=50):
-    # Option can be in ['hog', 'basic', 'multi']
+def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'euclidean', match_size=50):
+    # Option can be in ['hog', 'rgb', 'gray','']
+    # Distance can be in ['euclidean', 'correlaion']
     t_paths = list(glob.glob(ts_path + "/*.jpg"))
     feature = fe.factory(option)
+    tm_result = []
     with open(os.path.join(output_path, "baseline.txt"), "a") as bl:
         image = cv2.imread(image_path)
         # Template matching operation
@@ -51,29 +53,22 @@ def template_matching(prelim_results, image_path, ts_path, output_path, option='
             patch = image[yt:yb,xl:xr]
             # For evert template
             dis = 0.0
+            diss = []
             for t_path in t_paths:
                 template = cv2.imread(t_path)
 
-                patch = resize(patch, width=match_size, height=match_size)
-                template = resize(template, width=match_size, height=match_size)
-                print(patch.shape)
-                print(template.shape)
+                patch = cv2.resize(patch, (match_size, match_size), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (match_size, match_size), interpolation = cv2.INTER_AREA)
 
                 p_feature = feature(patch)
                 t_feature = feature(template)
-                print(patch.shape)
-                print(template.shape)
 
                 if distance == 'euclidean':
                     dis = scipy.spatial.distance.euclidean(t_feature.flatten(), p_feature.flatten())
                 elif distance == 'correlation':
                     dis = scipy.spatial.distance.correlation(t_feature.flatten(), p_feature.flatten())
-                # print(heatmap)
-                print(dis)
-                return
-
-        pass
-
+                diss.append(dis)
+            print(diss)
     bl.close()
 
 
