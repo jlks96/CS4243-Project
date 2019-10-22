@@ -143,6 +143,12 @@ A `eval.txt` file will be generated which contains the average mAP for all the m
 
 Folder structure: `baseline -> parameters -> k_idx -> waldo.txt + wenda.txt + wizard.txt`
 
+## Ensemble Detector
+
+```
+python ensemble_detector.py -c <classifier> -ip <image path> -ii <3 digit image index> -op <output folder> -tp <template folder>
+```
+
 ## References
 - Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
 - [OpenCV's tutorial](https://docs.opencv.org/trunk/dc/d88/tutorial_traincascade.html)
