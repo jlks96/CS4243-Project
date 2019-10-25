@@ -18,8 +18,8 @@ def generate_baselines(validation_set, test_img_path, i):
         min_hit_rate = param_list[2]
         max_false_alarm_rate = param_list[3]
         mode = param_list[4]
-        num_pos = 200 # Placeholder value
-        num_neg = 200 # Placeholder value
+        num_pos = 300 # Placeholder value
+        num_neg = 300 # Placeholder value
         
         for character in ["waldo", "wenda", "wizard"]:
             for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
@@ -119,10 +119,15 @@ if __name__ == "__main__":
     _anno_path = os.path.join("..", "datasets", "Annotations", "{}.xml")
     _train_txt_path = os.path.join("..", "datasets", "ImageSets", "train.txt")
 
-    # Read in validation sets
+    # Read in n images from validation sets
+    n = 10
     v = open("validation_sets.txt", "r")
     lines = v.readlines()
-    splitlines = [x.strip().split(' ') for x in lines]
+    splitlines = []
+    for line in lines:
+        splitline = line.strip().split(' ')
+        splitlines.append(splitline[0:n])
+    print(splitlines)
 
     # Generate baselines
     for i in range(_k):
