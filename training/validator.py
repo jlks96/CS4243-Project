@@ -127,7 +127,7 @@ if __name__ == "__main__":
     for line in lines:
         splitline = line.strip().split(' ')
         splitlines.append(splitline[0:n])
-    print(splitlines)
+    print("Number of images validated against:", len(splitlines[0]))
 
     # Generate baselines
     for i in range(_k):
