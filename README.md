@@ -146,8 +146,14 @@ Folder structure: `baseline -> parameters -> k_idx -> waldo.txt + wenda.txt + wi
 ## Ensemble Detector
 
 ```
-python ensemble_detector.py -c <classifier> -ip <image path> -ii <3 digit image index> -op <output folder> -tp <template folder>
+python ensemble_detector.py -ii <image input text file>
 ```
+
+Ensemble detector will execute the two-stage detection and outputs to the corresponding baseline files.
+Baselines are stored in the `baseline` folder.
+Templates are stored in the `template` folder.
+Cascade classifier models are stored in the `classifier` folder.
+Format for each line in image input text file: `path\to\image img_idx`
 
 ## References
 - Training examples derived from (https://github.com/vc1492a/Hey-Waldo)
