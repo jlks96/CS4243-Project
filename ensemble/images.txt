@@ -1,0 +1,2 @@
+..\datasets\JPEGImages\003.jpg 003
+..\datasets\JPEGImages\018.jpg 018
