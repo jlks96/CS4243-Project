@@ -73,8 +73,8 @@ def template_matching(prelim_results, image_path, ts_path, output_path, option='
         # score = np.array([tr[-1]+tr[-2]*0.5 for tr in tm_result])
         # score = np.array([tr[-1] for tr in tm_result])
         # score = (np.max(score)-score)/(np.max(score)-np.min(score))
-
-        scores = np.subtract(1, results)
+        score = np.array([tr[-1] for tr in tm_result])
+        score = np.subtract(1, score)
 
         for (img_idx, _, x, y, xr, yb), tm_score in zip(prelim_results, score):
             # print((img_idx, _, x, y, xr, yb), tm_score)
