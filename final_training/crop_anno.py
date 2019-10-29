@@ -26,7 +26,7 @@ def crop_annotation(image_file, anno_file, image_id, save_dir):
         y2 = int(bbox.find('ymax').text)
         anno.append({'name':name, 'score':1, 'bbox':[x1,y1,x2,y2]})        
         crop_image = image[y1:y2, x1:x2]
-        newfilename = save_dir + "\\" +  name + "\\" + image_id + "_" + str(idx) + ".jpg"
+        newfilename = os.path.join(save_dir, name, image_id + "_" + str(idx) + ".jpg")
         cv2.imwrite(newfilename, crop_image)
         print(newfilename)
 
