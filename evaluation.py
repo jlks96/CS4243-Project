@@ -8,13 +8,11 @@
 from voc_eval import *
 
 detpath = 'baseline/{}.txt'
-# detpath = 'template_matching/{}.txt'
 annopath = 'datasets/Annotations/{}.xml'
 imagesetfile = 'datasets/ImageSets/val.txt'
 cachedir = 'cache_anno'
 
 classes = ['waldo', 'wenda', 'wizard']
-# classes = ['waldo']
 meanAP = 0
 for idx, classname in enumerate(classes) :
     rec, prec, ap = voc_eval(detpath, annopath, imagesetfile, classname,
