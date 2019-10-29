@@ -18,7 +18,7 @@ def cascade_classify(classifier_path, image_path):
     cascade = cv2.CascadeClassifier(classifier_path)
 
     # Cascade multiscale detection
-    detections = cascade.detectMultiScale(img, scaleFactor=1.05)
+    detections = cascade.detectMultiScale(img, scaleFactor=1.2)
 
     for (x, y, w, h) in detections:
         # Output to results list
@@ -71,10 +71,14 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
 
         # Compute scores for each patch from results array
         # Formula: patch_score = (max_distance - patch_distance) / (max_distance - min_distance)
-        scores = (np.max(results) - results) / (np.max(results) - np.min(results))
+        # if (np.max(results) - np.min(results)) > 0:
+        #     scores = (np.max(results) - results) / (np.max(results) - np.min(results)) 
+
+        # Formula: score = 1 - correlation distance
+        scores = np.subtract(1, results)
 
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
-            if (score > 0.6):
+            if (score > 0.4):
                 # Output to baseline
                 bl.write(" ".join(map(str, [image_idx, score, x1, y1, x2, y2])) + "\n")
 
