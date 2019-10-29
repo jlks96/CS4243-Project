@@ -35,7 +35,7 @@ def cascade_classify(classifier, image_path, image_idx):
 
     return results
 
-def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'euclidean', match_size=50):
+def template_matching(prelim_results, image_path, ts_path, output_path, option='hog', distance = 'correlation', match_size=50):
     # Option can be in ['hog', 'rgb', 'gray','']
     # Distance can be in ['euclidean', 'correlaion']
     t_paths = list(glob.glob(ts_path + "/*.jpg"))
@@ -71,12 +71,14 @@ def template_matching(prelim_results, image_path, ts_path, output_path, option='
             tm_result.append((np.mean(diss), np.min(diss)))
 
         # score = np.array([tr[-1]+tr[-2]*0.5 for tr in tm_result])
-        score = np.array([tr[-1] for tr in tm_result])
-        score = (np.max(score)-score)/(np.max(score)-np.min(score))
+        # score = np.array([tr[-1] for tr in tm_result])
+        # score = (np.max(score)-score)/(np.max(score)-np.min(score))
+
+        scores = np.subtract(1, results)
 
         for (img_idx, _, x, y, xr, yb), tm_score in zip(prelim_results, score):
             # print((img_idx, _, x, y, xr, yb), tm_score)
-            if (tm_score > 0):
+            if (tm_score > 0.4):
                 # Outputs to baseline.txt
                 bl.write(" ".join(map(str, [img_idx, tm_score, x, y, xr, yb])) + "\n")
                 # Visualisation
