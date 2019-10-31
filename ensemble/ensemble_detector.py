@@ -26,7 +26,7 @@ def cascade_classify(classifier_path, image_path):
 
     return results
 
-def template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, size=50):
+def template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, size=50):
     # Get all template paths in template folder
     template_paths = list(glob.glob(template_folder + "/*.jpg"))
 
@@ -34,6 +34,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     dist_metric = scipy.spatial.distance.correlation
     
     image = cv2.imread(image_path)
+
+    scale = 1 if part == 'head' else 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -52,8 +54,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 template = cv2.imread(tp)
 
                 # Resize patch and template to the same size
-                patch = cv2.resize(patch, (size, size), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (size, size), interpolation = cv2.INTER_AREA)
+                patch = cv2.resize(patch, (scale*size, size), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (scale*size, size), interpolation = cv2.INTER_AREA)
 
                 # Get HOG features for patch and templates using grayscale
                 p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
@@ -114,4 +116,4 @@ if __name__ == "__main__":
                 prelim_results = cascade_classify(classifier_path, image_path)
                 # Second stage: template matching
                 if (len(prelim_results) > 0):
-                    template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path)
+                    template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part)
