@@ -44,7 +44,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     
     image = cv2.imread(image_path)
 
-    scale = 1 if part == 'head' else 2.5
+    # Set up aspect ratio
+    ratio = 1 if part == "head" else 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -62,9 +63,9 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
             for tp in template_paths:
                 template = cv2.imread(tp)
 
-                # Resize patch and template to the same size
-                patch = cv2.resize(patch, (scale*size, size), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (scale*size, size), interpolation = cv2.INTER_AREA)
+                # Resize patch and template to the same size and aspect ratio
+                patch = cv2.resize(patch, (size, ratio*size), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (size, ratio*size), interpolation = cv2.INTER_AREA)
 
                 # Get HOG features for patch and templates using grayscale
                 p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
@@ -72,6 +73,7 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 t_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=9, 
                                                 pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
 
+                # Calculate distance between patch and template
                 dist = dist_metric(t_feature, p_feature)
                 dists.append(dist)
             
@@ -97,8 +99,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description='Runner for ensemble detector.')
-    parser.add_argument('-ii', '--input_images', required=True, help="text files containing input image paths and indices")
+    parser = ArgumentParser(description="Runner for ensemble detector.")
+    parser.add_argument("-ii", "--input_images", required=True, help="text files containing input image paths and indices")
     args = parser.parse_args()
 
     # Folder name constants
