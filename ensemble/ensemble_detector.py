@@ -17,8 +17,17 @@ def cascade_classify(classifier_path, image_path):
     img = cv2.imread(image_path)
     cascade = cv2.CascadeClassifier(classifier_path)
 
+    # Set scale factor according to image size
+    img_size = img.shape[0] * img.shape[1]
+    if img_size < 500000: # Small image
+        scale_factor = 1.05
+    elif img_size < 2000000: # Medium image
+        scale_factor = 1.1
+    else: # Large image
+        scale_factor = 1.2
+
     # Cascade multiscale detection
-    detections = cascade.detectMultiScale(img, scaleFactor=1.2)
+    detections = cascade.detectMultiScale(img, scaleFactor=scale_factor)
 
     for (x, y, w, h) in detections:
         # Output to results list
