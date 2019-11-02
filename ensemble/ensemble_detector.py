@@ -45,7 +45,7 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     image = cv2.imread(image_path)
 
     # Set up aspect ratio
-    ratio = 1 if part == "head" else 2.5
+    ratio = 1.2 if part == "head" else 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -64,8 +64,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 template = cv2.imread(tp)
 
                 # Resize patch and template to the same size and aspect ratio
-                patch = cv2.resize(patch, (size, ratio*size), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (size, ratio*size), interpolation = cv2.INTER_AREA)
+                patch = cv2.resize(patch, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
 
                 # Get HOG features for patch and templates using grayscale
                 p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
@@ -83,15 +83,11 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
         results = np.array(results)
 
         # Compute scores for each patch from results array
-        # Formula: patch_score = (max_distance - patch_distance) / (max_distance - min_distance)
-        # if (np.max(results) - np.min(results)) > 0:
-        #     scores = (np.max(results) - results) / (np.max(results) - np.min(results)) 
-
         # Formula: score = 1 - correlation distance
         scores = np.subtract(1, results)
 
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
-            if (score > 0.4):
+            if (score > 0.2):
                 # Output to baseline
                 bl.write(" ".join(map(str, [image_idx, score, x1, y1, x2, y2])) + "\n")
 
