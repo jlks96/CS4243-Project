@@ -34,15 +34,15 @@ source_dir = "PositiveSamples"
 save_dir = "PositiveSamples"
 
 characters = ["\\waldo"]
-components = ["\\head", "\\body", "\\full"]
+components = ["\\full", "\\head", "\\torso"]
 
 
 #Set these boolean flags to True to perform respective functions
 do_rotate = False
-do_blur = False
+do_blur = True
 #do_flip = False
-do_brightness = False
-do_contrast = False
+do_brightness = True
+do_contrast = True
 do_gaussnoise = True
 
 #Applied to all three characters:
@@ -62,8 +62,8 @@ contrast_levels = [0.85, 0.9, 0.95, 1.05, 1.1, 1.15]
 
 
 #Counter for number of images edited respectively
-rotated_images = 0
-blurred_images = 0
+rotated_images = 1
+blurred_images = 1
 flipped_images = 0
 
 """
@@ -247,8 +247,8 @@ for character in characters:
                 #BGR2RGB conversion is not necessary as the function flips the R and B channels
                 print(image_file)
 
-                if do_rotate:
-                    rotated_images += rotate(image, image_file, image_id, save_folder)
+                #if do_rotate:
+                    #rotated_images += rotate(image, image_file, image_id, save_folder)
                 if do_blur:
                     gauss_blur(image, image_file, image_id, save_folder)
                 if do_contrast:

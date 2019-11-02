@@ -6,7 +6,7 @@ from tqdm import tqdm
 sp = '\\' if str(system()) == 'Windows' else '/'
 # separator
 
-training_set = open('ImageSets'+sp+'train.txt')
+training_set = open('ImageSets'+sp+'val.txt')
 
 for idx in tqdm(training_set):
     tree = ET.parse('Annotations'+sp+'{}.xml'.format(idx[:3]))
