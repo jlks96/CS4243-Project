@@ -4,30 +4,30 @@ import sys
 import math
 import scipy
 import glob
+import time
 import skimage.feature
 import numpy as np
 from argparse import ArgumentParser
 
-def cascade_classify(classifier_path, image_path):
+def cascade_classify(classifier_path, image):
     # Store list of detection results by cascade classifier
     # Format of detection: (x1, y1, x2, y2)
     results = []
 
-    # Read in image and classifier
-    img = cv2.imread(image_path)
+    # Read in classifier
     cascade = cv2.CascadeClassifier(classifier_path)
 
     # Set scale factor according to image size
-    img_size = img.shape[0] * img.shape[1]
-    if img_size < 500000: # Small image
-        scale_factor = 1.05
-    elif img_size < 2000000: # Medium image
+    image_size = image.shape[0] * image.shape[1]
+    if image_size < 500000: # Small image
+        scale_factor = 1.01
+    elif image_size < 2000000: # Medium image
         scale_factor = 1.1
     else: # Large image
         scale_factor = 1.2
 
     # Cascade multiscale detection
-    detections = cascade.detectMultiScale(img, scaleFactor=scale_factor)
+    detections = cascade.detectMultiScale(image, scaleFactor=scale_factor)
 
     for (x, y, w, h) in detections:
         # Output to results list
@@ -35,17 +35,20 @@ def cascade_classify(classifier_path, image_path):
 
     return results
 
-def template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, size=50):
+def template_matching(prelim_results, image, image_idx, template_folder, baseline_path, part, size=50):
     # Get all template paths in template folder
     template_paths = list(glob.glob(template_folder + "/*.jpg"))
 
     # Use correlation distance as the metric
     dist_metric = scipy.spatial.distance.correlation
-    
-    image = cv2.imread(image_path)
 
-    # Set up aspect ratio
-    ratio = 1.2 if part == "head" else 2.5
+    # Set up aspect ratio of detection window
+    if part == "head":
+        ratio = 1.2
+    elif part == "torso":
+        ratio = 2
+    else:
+        ratio = 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -78,7 +81,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 dists.append(dist)
             
             # Use the minimum (best) distance for the current patch as the result and add to results list
-            results.append(min(dists))
+            if len(dist) > 0:
+                results.append(min(dists))
 
         results = np.array(results)
 
@@ -111,16 +115,23 @@ if __name__ == "__main__":
     if not os.path.exists(output_baseline_folder):
         os.makedirs(output_baseline_folder)
 
+    start = time.time()
     # Start detections for all characters and body parts
-    for character in ["waldo", "wenda", "wizard"]:
-        for part in ["head", "full"]:
-            for image_path, image_idx in image_paths_indices:
+    for image_path, image_idx in image_paths_indices:
+        # Read in image
+        image = cv2.imread(image_path) 
+        for character in ["waldo", "wenda", "wizard"]:
+            for part in ["head", "full", "torso"]:
+                # Setup paths
                 classifier_path = os.path.join(classifier_folder, character, part, "cascade.xml")
                 baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
                 template_folder = os.path.join(template_parent_folder, character, part)
 
                 # First stage: cascade classifying
-                prelim_results = cascade_classify(classifier_path, image_path)
+                prelim_results = cascade_classify(classifier_path, image)
                 # Second stage: template matching
                 if (len(prelim_results) > 0):
-                    template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part)
+                    template_matching(prelim_results, image, image_idx, template_folder, baseline_path, part)
+
+    # Output total time taken
+    print("Total time taken: {} seconds".format(time.time() - start))
