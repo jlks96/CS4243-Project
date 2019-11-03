@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     # Generate bg and info files for all k training sets
     for character in ["waldo", "wenda", "wizard"]:
-        for part in ["full", "head"]:
+        for part in ["full", "head", "torso"]:
             char_part_pos_path = os.path.join(_pos_path, character, part)
             storage_path = os.path.join("data", character, part)
             generate_bg(_neg_path, storage_path)
