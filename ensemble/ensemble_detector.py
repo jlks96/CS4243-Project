@@ -17,8 +17,17 @@ def cascade_classify(classifier_path, image_path):
     img = cv2.imread(image_path)
     cascade = cv2.CascadeClassifier(classifier_path)
 
+    # Set scale factor according to image size
+    img_size = img.shape[0] * img.shape[1]
+    if img_size < 500000: # Small image
+        scale_factor = 1.05
+    elif img_size < 2000000: # Medium image
+        scale_factor = 1.1
+    else: # Large image
+        scale_factor = 1.2
+
     # Cascade multiscale detection
-    detections = cascade.detectMultiScale(img, scaleFactor=1.2)
+    detections = cascade.detectMultiScale(img, scaleFactor=scale_factor)
 
     for (x, y, w, h) in detections:
         # Output to results list
@@ -35,7 +44,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     
     image = cv2.imread(image_path)
 
-    scale = 1 if part == 'head' else 2.5
+    # Set up aspect ratio
+    ratio = 1.2 if part == "head" else 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -53,9 +63,9 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
             for tp in template_paths:
                 template = cv2.imread(tp)
 
-                # Resize patch and template to the same size
-                patch = cv2.resize(patch, (scale*size, size), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (scale*size, size), interpolation = cv2.INTER_AREA)
+                # Resize patch and template to the same size and aspect ratio
+                patch = cv2.resize(patch, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
 
                 # Get HOG features for patch and templates using grayscale
                 p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
@@ -63,6 +73,7 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 t_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=9, 
                                                 pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
 
+                # Calculate distance between patch and template
                 dist = dist_metric(t_feature, p_feature)
                 dists.append(dist)
             
@@ -72,15 +83,11 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
         results = np.array(results)
 
         # Compute scores for each patch from results array
-        # Formula: patch_score = (max_distance - patch_distance) / (max_distance - min_distance)
-        # if (np.max(results) - np.min(results)) > 0:
-        #     scores = (np.max(results) - results) / (np.max(results) - np.min(results)) 
-
         # Formula: score = 1 - correlation distance
         scores = np.subtract(1, results)
 
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
-            if (score > 0.4):
+            if (score > 0.2):
                 # Output to baseline
                 bl.write(" ".join(map(str, [image_idx, score, x1, y1, x2, y2])) + "\n")
 
@@ -88,8 +95,8 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description='Runner for ensemble detector.')
-    parser.add_argument('-ii', '--input_images', required=True, help="text files containing input image paths and indices")
+    parser = ArgumentParser(description="Runner for ensemble detector.")
+    parser.add_argument("-ii", "--input_images", required=True, help="text files containing input image paths and indices")
     args = parser.parse_args()
 
     # Folder name constants

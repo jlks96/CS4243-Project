@@ -6,7 +6,7 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
 
     # Folder structure: data -> character -> part -> trained_model
     for character in ["waldo", "wenda", "wizard"]:
-        for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
+        for part, h_w_scale in zip(["full", "head", "torso"], [2.5, 1.2, 2]):
 
             # Set height according to the width and body part
             # body: h = 1.5w, full: h = 2.5w, head: h = w
@@ -78,8 +78,8 @@ if __name__ == "__main__":
 
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 500
-    numNeg = 500
+    numPos = 200
+    numNeg = 600
 
     train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
     print("Time taken:", time.time() - start)

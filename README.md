@@ -147,6 +147,7 @@ Folder structure: `baseline -> parameters -> k_idx -> waldo.txt + wenda.txt + wi
 
 ```
 python ensemble_detector.py -ii <image input text file>
+python ensemble_detector_visualizer.py -ip <single input image path>
 ```
 
 Ensemble detector will execute the two-stage detection and outputs to the corresponding baseline files.
