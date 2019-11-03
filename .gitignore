@@ -1,8 +1,3 @@
-datasets/PositiveImages/*.jpg
-template_matching/results/*.jpg
-template_matching/templates/
-*.DS_Store
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -142,5 +137,9 @@ training/data/
 training/trained_models
 training/cache_anno/
 training/*.txt
+datasets/PositiveImages/*.jpg
+template_matching/results/*.jpg
+template_matching/templates/
 *.DS_Store
+.DS_Store
 
