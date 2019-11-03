@@ -2,16 +2,15 @@ import os
 import time
 from argparse import ArgumentParser
 
-def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k): # Training parameters
+def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg): # Training parameters
 
     # Folder structure: data -> character -> part -> trained_model
     for character in ["waldo", "wenda", "wizard"]:
-        for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
+        for part, h_w_scale in zip(["full", "head", "torso"], [2.5, 1.2, 2]):
 
             # Set height according to the width and body part
-            # body: h = 1.5w, full: h = 2.5w, head: h = w
+            # full: h = 2.5w, head: h = 1.2w, torso: h = 2w
             h = float(w) * h_w_scale
-
             
             # Determine paths
             data_folder = os.path.join("data", character, part)
@@ -20,8 +19,6 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
             bg_path = os.path.join(data_folder, "bg.txt")
 
             # Create positive examples (pos.vec)
-            # info = open(info_path, "r")
-            # num_posv = len(info.readlines()) # Create as many pos for pos.vec as in info.dat
             num_posv = 500 # hardcode for validation
             create_samples_cmd = "opencv_createsamples -info {} -num {} -w {} -h {} -vec {}".format(
                 info_path, num_posv, w, h, pos_vec_path)
@@ -43,9 +40,6 @@ def train(w, bt, min_hit_rate, max_false_alarm_rate, mode, num_pos, num_neg, k):
                 -bt {} -minHitRate {} -maxFalseAlarmRate {} -mode {}".format(
                     model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w, bt, min_hit_rate, max_false_alarm_rate, mode)
             
-            # # Basic training w/o -bt -minHitRate -maxFalseAlarmRate -mode
-            # train_cmd = "opencv_traincascade -data {} -vec {} -bg {} -numPos {} -numNeg {} -numStages {} -h {} -w {}".format(
-            #         model_folder, pos_vec_path, bg_path, num_pos, num_neg, num_stage, h, w)
             os.system(train_cmd)
 
 def get_num_pos(minHitRate):
@@ -73,13 +67,10 @@ if __name__ == "__main__":
     parser.add_argument('-mode', required=True, help="mode of haar features")
     args = parser.parse_args()
 
-    # Constants
-    _k = 2 # k-fold cross validation
-
     # numPos = get_num_pos(float(args.minHitRate))
     # numNeg = 2 * numPos
-    numPos = 500
-    numNeg = 500
+    numPos = 200
+    numNeg = 600
 
-    train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg, _k)
+    train(args.w, args.bt, args.minHitRate, args.maxFalseAlarmRate, args.mode, numPos, numNeg)
     print("Time taken:", time.time() - start)
