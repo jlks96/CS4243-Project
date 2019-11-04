@@ -35,7 +35,7 @@ def cascade_classify(classifier_path, image):
 
     return results
 
-def template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, parameter, size=50):
+def template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, parameter, size=60):
     # Get all template paths in template folder
     template_paths = list(glob.glob(template_folder + "/*.jpg"))
 
@@ -48,7 +48,13 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     
     image = cv2.imread(image_path)
 
-    scale = 1 if part == 'head' else 2.5
+    # Set up aspect ratio of detection window
+    if part == "head":
+        ratio = 1.2
+    elif part == "torso":
+        ratio = 2
+    else:
+        ratio = 2.5
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -67,14 +73,14 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
                 template = cv2.imread(tp)
 
                 # Resize patch and template to the same size
-                patch = cv2.resize(patch, (int(scale*size), size), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (int(scale*size), size), interpolation = cv2.INTER_AREA)
+                patch = cv2.resize(patch, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
+                template = cv2.resize(template, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
 
                 # Get HOG features for patch and templates using grayscale
-                p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
-                                                pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
-                t_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=9, 
-                                                pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
+                p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=5, 
+                                                pixels_per_cell=(6, 6), cells_per_block=(2, 2), visualize=False)
+                t_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=5, 
+                                                pixels_per_cell=(6, 6), cells_per_block=(2, 2), visualize=False)
 
                 dist = dist_metric(t_feature, p_feature)
                 dists.append(dist)
@@ -91,10 +97,10 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
         #     scores = (np.max(results) - results) / (np.max(results) - np.min(results)) 
 
         # Formula: score = 1 - correlation distance
-        if eucl:
-            scores = np.divide(1, np.add(1, results))
-        else:
-            scores = np.subtract(1, results)
+        # if eucl:
+        #     scores = np.divide(1, np.add(1, results))
+        # else:
+        scores = np.subtract(1, results)
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
             if (score > parameter):
                 # Output to baseline
@@ -109,17 +115,20 @@ if __name__ == "__main__":
     parser.add_argument('-pm', '--parameter', required=True, help="tuning parameter")
     args = parser.parse_args()
     
+    name = args.parameter
+
     # thresholds = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
     # Folder name constants
     # classifier_folder = "25_GAB_0.999_0.4_BASIC"
-    classifier_folder = "25_GAB_0.995_0.425_BASIC"
+    # classifier_folder = "25_GAB_0.995_0.425_BASIC"
+    classifier_folder = "../final_training/trained_models/20_GAB_0.999_0.425_BASIC"
     
     template_parent_folder = "template"
 
     # Prepare input image paths and indices
     image_paths_indices = [line.strip("\n").split(" ") for line in open(args.input_images)]
-    param = args.parameter
+    # param = args.parameter
     # Start detections for all characters and body parts
     start = time.time()
     for character in ["waldo", "wenda", "wizard"]:
@@ -138,17 +147,26 @@ if __name__ == "__main__":
 
                 classifier_path = os.path.join(classifier_folder, character, part, "cascade.xml")
                 # print(classifier_path)
-                output_baseline_folder = os.path.join("baselines",str(param),"baseline")
-                # print(output_baseline_folder)
-                # Create output baseline folder if doesn't exist
-                if not os.path.exists(output_baseline_folder):
-                    print(output_baseline_folder)
-                    os.makedirs(output_baseline_folder)
-                baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
+                # output_baseline_folder = os.path.join("baselines",str(param),"baseline")
+                # # print(output_baseline_folder)
+                # # Create output baseline folder if doesn't exist
+                # if not os.path.exists(output_baseline_folder):
+                #     print(output_baseline_folder)
+                #     os.makedirs(output_baseline_folder)
+                # baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
                 # First stage: cascade classifying
                 prelim_results = cascade_classify(classifier_path, image)
                 # Second stage: template matching
                 if (len(prelim_results) > 0):
-                    template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, 0.2)
+                    # for p_size in [60]:
+                    for param in [0.1, 0.15, 0.175, 0.2]:
+                        output_baseline_folder = os.path.join("baselines",'60_6_'+str(param),"baseline")
+                        # print(output_baseline_folder)
+                        # Create output baseline folder if doesn't exist
+                        if not os.path.exists(output_baseline_folder):
+                            print(output_baseline_folder)
+                            os.makedirs(output_baseline_folder)
+                        baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))                            
+                        template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, param)
                 # print('\n---')
     print("Total time taken: {} seconds".format(time.time() - start))
