@@ -10,7 +10,6 @@ def generate_baselines(validation_set, test_img_path, i):
     _, params, _ = next(os.walk("trained_models"))
     
     for param in params:
-        print(param)
         # Determine parameters
         param_list = param.split("_")
         w = param_list[0]
@@ -18,13 +17,13 @@ def generate_baselines(validation_set, test_img_path, i):
         min_hit_rate = param_list[2]
         max_false_alarm_rate = param_list[3]
         mode = param_list[4]
-        num_pos = 300 # Placeholder value
-        num_neg = 300 # Placeholder value
+        num_pos = 100 # Placeholder value
+        num_neg = 100 # Placeholder value
         
         for character in ["waldo", "wenda", "wizard"]:
-            for part, h_w_scale in zip(["full", "head"], [2.5, 1]):
+            for part, h_w_scale in zip(["head", "torso"], [1.2, 2]):
                 # Set height according to the width and body part
-                # body: h = 1.5w, full: h = 2.5w, head: h = w
+                # head: h = 1.2w, torso: h = 2w
                 h = float(w) * h_w_scale
 
                 # Determine paths
@@ -33,14 +32,12 @@ def generate_baselines(validation_set, test_img_path, i):
                 bg_path = os.path.join(data_folder, "bg.txt")
                 model_folder = os.path.join("trained_models", param, str(i), character, part)
 
-                # Evaluate for numStages = 10 to 17
+                # Evaluate for numStages = 10 to actualNumStages
                 actualNumStages = 0
-                
-                for dirpath, dirnames, files in os.walk(model_folder):
+                for _, _, files in os.walk(model_folder):
                     for f in files:
                         if "stage" in f:
                             actualNumStages += 1
-                print(actualNumStages, "stages")
                 
                 for num_stage in range(10, actualNumStages):
                     # Use training command to set numStages
@@ -59,7 +56,6 @@ def generate_baselines(validation_set, test_img_path, i):
                         model = os.path.join(model_folder, "cascade.xml")
                         cascade = cv2.CascadeClassifier(model)
 
-                        
                         # Find in all subdir of test_img_path
                         for root, _, files in os.walk(test_img_path):
                             for filename in files:
@@ -114,20 +110,15 @@ def evaluate_baselines(anno_path, train_txt_path):
 if __name__ == "__main__":
     # Constants
     start = time.time()
-    _k = 2
+    _k = 5
     _test_img_path = os.path.join("..", "datasets", "JPEGImages")
     _anno_path = os.path.join("..", "datasets", "Annotations", "{}.xml")
     _train_txt_path = os.path.join("..", "datasets", "ImageSets", "train.txt")
 
-    # Read in n images from validation sets
-    n = 10
+    # Read in validation sets
     v = open("validation_sets.txt", "r")
     lines = v.readlines()
-    splitlines = []
-    for line in lines:
-        splitline = line.strip().split(' ')
-        splitlines.append(splitline[0:n])
-    print("Number of images validated against:", len(splitlines[0]))
+    splitlines = [x.strip().split(' ') for x in lines]
 
     # Generate baselines
     for i in range(_k):
