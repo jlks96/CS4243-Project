@@ -35,20 +35,39 @@ def cascade_classify(classifier_path, image):
 
     return results
 
-def template_matching(prelim_results, image, image_idx, template_folder, baseline_path, part, size=50):
-    # Get all template paths in template folder
-    template_paths = list(glob.glob(template_folder + "/*.jpg"))
+def template_matching(prelim_results, image, image_idx, template_folder, baseline_path, part):
+    # Use correlation distance as the metric
+    dist_metric = scipy.spatial.distance.correlation
 
-    # Use euclidean distance as the metric
-    dist_metric = scipy.spatial.distance.euclidean
-
-    # Set up aspect ratio of detection window
+    # Set up width and aspect ratio of detection window
+    width = 60
     if part == "head":
         ratio = 1.2
     elif part == "torso":
         ratio = 2
     else:
         ratio = 2.5
+
+    # Compute and store HOG features for templates
+    # Get all template paths in template folder
+    template_paths = list(glob.glob(template_folder + "/*.jpg"))
+    
+    # List of HOG feature for templates
+    template_features = []
+
+    # For every template in template paths
+    for tp in template_paths:
+        template = cv2.imread(tp)
+
+        # Resize template and to the common size and aspect ratio
+        template = cv2.resize(template, (int(width), int(ratio*width)), interpolation = cv2.INTER_AREA)
+
+        # Get HOG feature for template using grayscale
+        template_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=5, 
+                                        pixels_per_cell=(6, 6), cells_per_block=(2, 2), visualize=False)
+
+        # Add template feature to list
+        template_features.append(template_feature)
 
     with open(baseline_path, "a") as bl:
         # Template matching operation
@@ -60,38 +79,34 @@ def template_matching(prelim_results, image, image_idx, template_folder, baselin
             # Crop the patch
             patch = image[y1:y2, x1:x2]
             
-            # List of distances between current patch and each of the templates
-            dists = []
-            # For every template in template paths
-            for tp in template_paths:
-                template = cv2.imread(tp)
+            # Minimum distance between current patch and each of the templates
+            min_dist = float('inf')
 
-                # Resize patch and template to the same size and aspect ratio
-                patch = cv2.resize(patch, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
-                template = cv2.resize(template, (int(size), int(ratio*size)), interpolation = cv2.INTER_AREA)
+            # Resize patch and to the common size and aspect ratio
+            patch = cv2.resize(patch, (int(width), int(ratio*width)), interpolation = cv2.INTER_AREA)
 
-                # Get HOG features for patch and templates using grayscale
-                p_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=9, 
-                                                pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
-                t_feature = skimage.feature.hog(cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), orientations=9, 
-                                                pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=False)
+            # Get HOG feature for patch using grayscale
+            patch_feature = skimage.feature.hog(cv2.cvtColor(patch, cv2.COLOR_BGR2GRAY), orientations=5, 
+                                                pixels_per_cell=(6, 6), cells_per_block=(2, 2), visualize=False)
 
+            # For every template in template feature in t_features
+            for template_feature in template_features:
                 # Calculate distance between patch and template
-                dist = dist_metric(t_feature, p_feature)
-                dists.append(dist)
+                dist = dist_metric(template_feature, patch_feature)
+                if dist < min_dist:
+                    min_dist = dist
             
             # Use the minimum (best) distance for the current patch as the result and add to results list
-            if len(dist) > 0:
-                results.append(min(dists))
+            results.append(min_dist)
 
         results = np.array(results)
 
         # Compute scores for each patch from results array
-        # Formula: score = 1 / (1 + euclidean distance)
-        scores = np.divide(1, np.add(1, results))
+        # Formula: score = 1 - correlation distance
+        scores = np.subtract(1, results)
 
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
-            if (score >= 0):
+            if (score >= 0.2):
                 # Output to baseline
                 bl.write(" ".join(map(str, [image_idx, score, x1, y1, x2, y2])) + "\n")
 
@@ -121,7 +136,7 @@ if __name__ == "__main__":
         # Read in image
         image = cv2.imread(image_path) 
         for character in ["waldo", "wenda", "wizard"]:
-            for part in ["head", "full", "torso"]:
+            for part in ["head", "torso"]:
                 # Setup paths
                 classifier_path = os.path.join(classifier_folder, character, part, "cascade.xml")
                 baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
