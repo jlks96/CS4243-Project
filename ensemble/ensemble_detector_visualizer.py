@@ -39,8 +39,8 @@ def template_matching(prelim_results, image, template_folder, character, part, s
     # Get all template paths in template folder
     template_paths = list(glob.glob(template_folder + "/*.jpg"))
 
-    # Use correlation distance as the metric
-    dist_metric = scipy.spatial.distance.correlation
+    # Use euclidean distance as the metric
+    dist_metric = scipy.spatial.distance.euclidean
 
     # Set up aspect ratio of detection window
     if part == "head":
@@ -86,8 +86,9 @@ def template_matching(prelim_results, image, template_folder, character, part, s
     results = np.array(results)
 
     # Compute scores for each patch from results array
-    # Formula: score = 1 - correlation distance
-    scores = np.subtract(1, results)
+    # Formula: score = 1 / (1 + euclidean distance)
+    scores = np.divide(1, np.add(1, results))
+    # print(scores)
 
     # Store all detections that pass threshold
     resolved_results = []
