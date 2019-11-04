@@ -4,21 +4,30 @@ import sys
 import math
 import scipy
 import glob
+import time
 import skimage.feature
 import numpy as np
 from argparse import ArgumentParser
 
-def cascade_classify(classifier_path, image_path):
+def cascade_classify(classifier_path, image):
     # Store list of detection results by cascade classifier
     # Format of detection: (x1, y1, x2, y2)
     results = []
 
-    # Read in image and classifier
-    img = cv2.imread(image_path)
+    # Read in classifier
     cascade = cv2.CascadeClassifier(classifier_path)
 
+    # Set scale factor according to image size
+    image_size = image.shape[0] * image.shape[1]
+    if image_size < 500000: # Small image
+        scale_factor = 1.01
+    elif image_size < 2000000: # Medium image
+        scale_factor = 1.1
+    else: # Large image
+        scale_factor = 1.2
+
     # Cascade multiscale detection
-    detections = cascade.detectMultiScale(img, scaleFactor=1.2)
+    detections = cascade.detectMultiScale(image, scaleFactor=scale_factor)
 
     for (x, y, w, h) in detections:
         # Output to results list
@@ -31,8 +40,11 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
     template_paths = list(glob.glob(template_folder + "/*.jpg"))
 
     # Use correlation distance as the metric
-    dist_metric = scipy.spatial.distance.euclidean
-    eucl = True
+    eucl = False
+    if eucl:
+        dist_metric = scipy.spatial.distance.euclidean
+    else:
+        dist_metric = scipy.spatial.distance.correlation
     
     image = cv2.imread(image_path)
 
@@ -71,16 +83,18 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
             results.append(min(dists))
 
         results = np.array(results)
-        if eucl:
-            results = (results - np.min(results))/(np.max(results)-np.min(results))
+        # if eucl:
+        # results = (results - np.min(results))/(np.max(results)-np.min(results))
         # Compute scores for each patch from results array
         # Formula: patch_score = (max_distance - patch_distance) / (max_distance - min_distance)
         # if (np.max(results) - np.min(results)) > 0:
         #     scores = (np.max(results) - results) / (np.max(results) - np.min(results)) 
 
         # Formula: score = 1 - correlation distance
-        scores = np.subtract(1, results)
-
+        if eucl:
+            scores = np.divide(1, np.add(1, results))
+        else:
+            scores = np.subtract(1, results)
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
             if (score > parameter):
                 # Output to baseline
@@ -92,19 +106,22 @@ def template_matching(prelim_results, image_path, image_idx, template_folder, ba
 if __name__ == "__main__":
     parser = ArgumentParser(description='Runner for ensemble detector.')
     parser.add_argument('-ii', '--input_images', required=True, help="text files containing input image paths and indices")
+    parser.add_argument('-pm', '--parameter', required=True, help="tuning parameter")
     args = parser.parse_args()
     
     # thresholds = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
     # Folder name constants
+    # classifier_folder = "25_GAB_0.999_0.4_BASIC"
     classifier_folder = "25_GAB_0.995_0.425_BASIC"
     
     template_parent_folder = "template"
 
     # Prepare input image paths and indices
     image_paths_indices = [line.strip("\n").split(" ") for line in open(args.input_images)]
-    stage = "euclidean"
+    param = args.parameter
     # Start detections for all characters and body parts
+    start = time.time()
     for character in ["waldo", "wenda", "wizard"]:
         for part in ["head", "full"]:
             print(character, part)
@@ -114,15 +131,14 @@ if __name__ == "__main__":
             for image_path, image_idx in image_paths_indices:
                 print(image_idx)
                 print('---')
+                image = cv2.imread(image_path)
                 # classifier_path = os.path.join(classifier_folder, character, part, "cascade.xml")
                 # baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
                 template_folder = os.path.join(template_parent_folder, character, part)
 
-                # for stage in stages:
-                    # print(stage, end=' ')
                 classifier_path = os.path.join(classifier_folder, character, part, "cascade.xml")
                 # print(classifier_path)
-                output_baseline_folder = os.path.join(str(stage),"baseline")
+                output_baseline_folder = os.path.join("baselines",str(param),"baseline")
                 # print(output_baseline_folder)
                 # Create output baseline folder if doesn't exist
                 if not os.path.exists(output_baseline_folder):
@@ -130,15 +146,9 @@ if __name__ == "__main__":
                     os.makedirs(output_baseline_folder)
                 baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
                 # First stage: cascade classifying
-                prelim_results = cascade_classify(classifier_path, image_path)
+                prelim_results = cascade_classify(classifier_path, image)
                 # Second stage: template matching
                 if (len(prelim_results) > 0):
-                    # for t in thresholds:
-                    # print(t, end=' ')
-                    # output_baseline_folder = os.path.join(str(t),"baseline")
-                    # # Create output baseline folder if doesn't exist
-                    # if not os.path.exists(output_baseline_folder):
-                    #     os.makedirs(output_baseline_folder)
-                    # baseline_path = os.path.join(output_baseline_folder, "{}.txt".format(character))
                     template_matching(prelim_results, image_path, image_idx, template_folder, baseline_path, part, 0.2)
                 # print('\n---')
+    print("Total time taken: {} seconds".format(time.time() - start))
