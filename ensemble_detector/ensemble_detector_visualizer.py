@@ -112,7 +112,6 @@ def template_matching(prelim_results, image, template_folder, character, part):
         if (score >= 0.25):
             resolved_results.append((character, x1, y1, x2, y2, score))
 
-    print(resolved_results)
     return resolved_results
 
 def visualize_detections(detections, image):
