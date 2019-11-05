@@ -21,9 +21,11 @@ def cascade_classify(classifier_path, image):
     image_size = image.shape[0] * image.shape[1]
     if image_size < 500000: # Small image
         scale_factor = 1.01
-    elif image_size < 2000000: # Medium image
+    elif image_size < 3000000: # Medium image
+        scale_factor = 1.05
+    elif image_size < 9000000: # Large image
         scale_factor = 1.1
-    else: # Large image
+    else: # Very large image
         scale_factor = 1.2
 
     # Cascade multiscale detection
@@ -106,7 +108,7 @@ def template_matching(prelim_results, image, image_idx, template_folder, baselin
         scores = np.subtract(1, results)
 
         for (x1, y1, x2, y2), score in zip(prelim_results, scores):
-            if (score >= 0.2):
+            if (score >= 0.25):
                 # Output to baseline
                 bl.write(" ".join(map(str, [image_idx, score, x1, y1, x2, y2])) + "\n")
 
