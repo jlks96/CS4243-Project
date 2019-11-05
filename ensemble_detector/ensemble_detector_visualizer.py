@@ -125,8 +125,8 @@ def visualize_detections(detections, image):
             color = (0, 0, 255) # Red for Wizard
 
         # Feel free to adjust thickness of rectangle and font size based on image size
-        cv2.rectangle(image, (x1, y1), (x2, y2), color, 6)
-        cv2.putText(image, character + " %.3f" % score, (x1, y1), cv2.FONT_ITALIC, 2.5, color, 6) 
+        cv2.rectangle(image, (x1, y1), (x2, y2), color, 9)
+        cv2.putText(image, character + " %.3f" % score, (x1, y1), cv2.FONT_ITALIC, 4, color, 9) 
 
     cv2.namedWindow("Where is Waldo?", cv2.WINDOW_NORMAL)
     cv2.imshow("Where is Waldo?", image)
